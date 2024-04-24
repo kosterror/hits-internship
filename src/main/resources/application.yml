@@ -2,7 +2,7 @@ spring:
   application:
     name: hits-internship
   datasource:
-    url: ${DB_URL:jdbc:postgresql://hi-db:5432/hits-internship}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/hits-internship}
     username: ${DB_USERNAME:hits-internship}
     password: ${DB_PASSWORD:hits-internship}
   jpa:
