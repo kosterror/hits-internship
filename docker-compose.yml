@@ -1,0 +1,19 @@
+services:
+  hi-back:
+    container_name: hi-back
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - hi-db
+    environment:
+      - DB_URL=jdbc:postgresql://hi-db:5432/hits-internship
+      - DB_USERNAME=hits-internship
+      - DB_PASSWORD=hits-internship
+  hi-db:
+    extends:
+      file: docker-compose.dev.yml
+      service: hi-db
+
+volumes:
+  hi-db: { }

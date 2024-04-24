@@ -1,0 +1,15 @@
+services:
+  hi-db:
+    container_name: hi-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: hits-internship
+      POSTGRES_USER: hits-internship
+      POSTGRES_PASSWORD: hits-internship
+    ports:
+      - "5432:5432"
+    volumes:
+      - hi-db:/var/lib/postgresql/data
+
+volumes:
+  hi-db: { }
