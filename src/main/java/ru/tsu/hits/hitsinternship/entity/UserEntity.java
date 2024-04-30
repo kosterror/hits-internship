@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -22,8 +23,17 @@ public class UserEntity {
 
     private String fullName;
 
+    private String email;
+
+    private String password;
+
+    private Boolean isActive;
+
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @ElementCollection
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private List<Role> roles;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
