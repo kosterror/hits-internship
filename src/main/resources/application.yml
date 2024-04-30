@@ -9,3 +9,12 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+  mail:
+    host: smtp.yandex.ru
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    port: 465
+    protocol: smtps
+
+application:
+  url: http://localhost:8080

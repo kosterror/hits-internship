@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Страница активации</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+<h2 class="mt-5 text-center">Активация аккаунта</h2>
+<form action="/activate" class="mt-4" method="post">
+    <input id="userId" name="userId" th:value="${userId}" type="hidden">
+    <div class="form-group">
+        <label for="password">Введите пароль:</label>
+        <input class="form-control" id="password" minlength="8" name="password" required type="password">
+    </div>
+    <input class="btn btn-primary" type="submit" value="Активировать">
+</form>
+</body>
+</html>
