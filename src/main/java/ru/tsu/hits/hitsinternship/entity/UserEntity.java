@@ -27,7 +27,7 @@ public class UserEntity {
 
     private String password;
 
-    private Boolean isActive;
+    private boolean isActive;
 
     @ElementCollection
     @CollectionTable(name = "user_refresh_token", joinColumns = @JoinColumn(name = "user_id"))

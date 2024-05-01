@@ -21,7 +21,6 @@ public class GroupService {
     private final GroupMapper groupMapper;
 
     public GroupDto createGroup(NewGroupDto newGroupDto) {
-
         GroupEntity group = groupMapper.newDtoToEntity(newGroupDto);
         groupRepository.save(group);
         return groupMapper.entityToDto(group);
@@ -31,13 +30,12 @@ public class GroupService {
     public void deleteGroup(UUID groupId) {
 
         if (!groupRepository.existsById(groupId)) {
-            throw new NotFoundException("Группы с таким id не существует");
+            throw new NotFoundException(String.format("Group with id %s not found", groupId));
         }
         groupRepository.deleteById(groupId);
     }
 
     public List<GroupDto> getGroups() {
-
         return groupRepository.findAll().stream()
                 .map(groupMapper::entityToDto)
                 .toList();

@@ -1,9 +1,11 @@
 package ru.tsu.hits.hitsinternship.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.specialties.NewSpecialityDto;
 import ru.tsu.hits.hitsinternship.dto.specialties.SpecialityDto;
@@ -20,23 +22,23 @@ public class SpecialityController {
 
     private final SpecialityService specialityService;
 
-    @Operation(summary = "Создать специальность")
-    @PostMapping("")
-    SpecialityDto createSpeciality(@Valid @RequestBody NewSpecialityDto newSpecialityDto) {
-
+    @Operation(summary = "Создать специальность", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @PostMapping
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    public SpecialityDto createSpeciality(@Valid @RequestBody NewSpecialityDto newSpecialityDto) {
         return specialityService.createSpeciality(newSpecialityDto);
     }
 
-    @Operation(summary = "Удалить специальность")
+    @Operation(summary = "Удалить специальность", security = @SecurityRequirement(name = "Bearer Authentication"))
     @DeleteMapping("/{specialityId}")
-    void deleteSpeciality(@Valid @PathVariable UUID specialityId) {
-
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    public void deleteSpeciality(@Valid @PathVariable UUID specialityId) {
         specialityService.deleteSpeciality(specialityId);
     }
 
     @Operation(summary = "Получить список специальностей")
-    @GetMapping("")
-    List<SpecialityDto> getSpecialities() {
+    @GetMapping
+    public List<SpecialityDto> getSpecialities() {
         return specialityService.getSpecialities();
     }
 }

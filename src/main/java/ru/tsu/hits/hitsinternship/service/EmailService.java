@@ -23,8 +23,15 @@ public class EmailService {
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setTo(user.getEmail());
-        mail.setSubject("Вы зарегистрированы в системе hits-internship");
-        mail.setText("Для активации аккаунта перейдите по ссылке: " + applicationUrl + "/activate/" + user.getId());
+        mail.setSubject("Регистрация в системе hits-internship");
+        mail.setText(String.format("Добрый день, %s, вы были зарегистрированы деканатом в системе для поиска и " +
+                                "прохождения стажировок 'hits-internship'. " +
+                                "Для завершения регистрации и активации аккаунта перейдите по ссылке: %s/activate/%s",
+                        user.getFullName(),
+                        applicationUrl,
+                        user.getId()
+                )
+        );
         mail.setFrom(username);
 
         javaMailSender.send(mail);
