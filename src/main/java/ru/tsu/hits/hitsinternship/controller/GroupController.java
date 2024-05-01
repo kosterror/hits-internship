@@ -2,9 +2,11 @@ package ru.tsu.hits.hitsinternship.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.group.GroupDto;
 import ru.tsu.hits.hitsinternship.dto.group.NewGroupDto;
@@ -21,23 +23,23 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @Operation(summary = "Создать группу")
-    @PostMapping("")
-    GroupDto createGroup(@Valid @RequestBody NewGroupDto newGroupDto) {
-
+    @Operation(summary = "Создать группу", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @PostMapping
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    public GroupDto createGroup(@Valid @RequestBody NewGroupDto newGroupDto) {
         return groupService.createGroup(newGroupDto);
     }
 
-    @Operation(summary = "Удалить группу")
+    @Operation(summary = "Удалить группу", security = @SecurityRequirement(name = "Bearer Authentication"))
     @DeleteMapping("/{groupId}")
-    void deleteGroup(@Valid @PathVariable UUID groupId) {
-
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    public void deleteGroup(@PathVariable UUID groupId) {
         groupService.deleteGroup(groupId);
     }
 
     @Operation(summary = "Получить список групп")
-    @GetMapping("")
-    List<GroupDto> getGroups() {
+    @GetMapping
+    public List<GroupDto> getGroups() {
         return groupService.getGroups();
     }
 

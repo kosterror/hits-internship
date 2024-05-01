@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Authentication authentication = new JwtAuthenticationToken(jwtUser);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception exception) {
+            log.error("Exception at jwt filter", exception);
             sendError(response);
             return;
         }

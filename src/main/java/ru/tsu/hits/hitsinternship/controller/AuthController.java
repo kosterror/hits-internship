@@ -1,9 +1,11 @@
 package ru.tsu.hits.hitsinternship.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,24 +21,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Авторизация")
+@Tag(name = "Регистраци, авторизация")
 public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Регистрация пользователя")
+    @Operation(summary = "Регистрация пользователя", security = @SecurityRequirement(name = "Bearer Authentication"))
     @PostMapping("/register")
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
     public void register(@Valid @RequestBody NewUserDto newUserDto) {
         authService.register(newUserDto);
     }
 
-    @Operation(summary = "Регистрация студентов")
+    @Operation(summary = "Регистрация студентов", security = @SecurityRequirement(name = "Bearer Authentication"))
     @PostMapping("/register-students")
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
     public void registerStudents(@Valid @RequestBody List<NewStudentDto> newStudentDtos) {
         authService.registerStudents(newStudentDtos);
     }
 
-    @Operation(summary = "Логин пользователя")
+    @Operation(summary = "Авторизация пользователя")
     @PostMapping("/login")
     public TokensDto login(@Valid @RequestBody LoginDto loginDto) {
         return authService.login(loginDto);
