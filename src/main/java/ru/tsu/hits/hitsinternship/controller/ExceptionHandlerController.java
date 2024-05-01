@@ -1,54 +1,115 @@
 package ru.tsu.hits.hitsinternship.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.tsu.hits.hitsinternship.exception.ApiError;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import ru.tsu.hits.hitsinternship.dto.api.ApiError;
+import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
+import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @ControllerAdvice
-public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
+public class ExceptionHandlerController {
 
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException exception
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(HttpServletRequest request,
+                                                    Exception exception
     ) {
+        logException(request, exception);
 
-        Map<String, List<String>> errors = new HashMap<>();
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiError("Internal service error"));
+    }
 
-        exception
-                .getBindingResult()
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidationException(HttpServletRequest request,
+                                                              MethodArgumentNotValidException exception) {
+        logException(request, exception);
+
+        var errors = new HashMap<String, List<String>>();
+
+        exception.getBindingResult()
                 .getAllErrors()
                 .forEach(error -> {
                     String fieldName = ((FieldError) error).getField();
-                    String message = error.getDefaultMessage();
+                    String errorMessage = error.getDefaultMessage();
 
-                    if (message != null) {
-                        if (errors.containsKey(fieldName)) {
-                            errors.get(fieldName).add(message);
-                        } else {
-                            List<String> newErrorList = new ArrayList<>();
-                            newErrorList.add(message);
-
-                            errors.put(fieldName, newErrorList);
-                        }
+                    if (errors.containsKey(fieldName)) {
+                        var messages = errors.get(fieldName);
+                        messages.add(errorMessage);
+                    } else {
+                        var messages = new ArrayList<String>();
+                        messages.add(errorMessage);
+                        errors.put(fieldName, messages);
                     }
                 });
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError("Validation error", errors));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFound(NoResourceFoundException exception)
+            throws NoResourceFoundException {
+        throw exception;
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiError> handleBadRequestException(HttpServletRequest request,
+                                                              BadRequestException exception) {
+        logException(request, exception);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(exception.getMessage()));
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFoundException(NotFoundException exception) {
-        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiError> handleNotFoundException(HttpServletRequest request,
+                                                            NotFoundException exception) {
+        logException(request, exception);
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiError> handleUnauthorizedException(HttpServletRequest request,
+                                                                UnauthorizedException exception) {
+        logException(request, exception);
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflictException(HttpServletRequest request,
+                                                            ConflictException exception) {
+        logException(request, exception);
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    private void logException(HttpServletRequest request, Exception exception) {
+        log.error("Error during: {} {}", request.getMethod(), request.getRequestURI(), exception);
     }
 
 }
