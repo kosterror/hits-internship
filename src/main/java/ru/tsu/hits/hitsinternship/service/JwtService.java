@@ -9,20 +9,19 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
-import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
+import ru.tsu.hits.hitsinternship.security.JwtAuthenticationToken;
 import ru.tsu.hits.hitsinternship.security.JwtUser;
 
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class JwtService {
 
@@ -34,6 +33,8 @@ public class JwtService {
 
     @Value("${application.jwt.secret}")
     private String secret;
+
+    private final UserService userService;
 
     public TokensDto generateTokens(UserEntity user) {
         Date issuedAt = new Date();
@@ -65,12 +66,19 @@ public class JwtService {
                 .compact();
     }
 
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+    public JwtAuthenticationToken getAuthenticationToken(String jwtToken) {
+        var userId = verifyTokenAndExtractUserId(jwtToken);
+        var user = userService.getUserEntityById(userId);
+
+        JwtUser jwtUser = new JwtUser(user.getId(),
+                user.getEmail(),
+                user.getRoles()
+        );
+
+        return new JwtAuthenticationToken(jwtUser);
     }
 
-    public JwtUser decodeAccessToken(String token) {
+    private UUID verifyTokenAndExtractUserId(String token) {
         try {
             var key = getSignKey();
             Jws<Claims> data = Jwts
@@ -80,23 +88,14 @@ public class JwtService {
                     .parseClaimsJws(token);
 
             Claims claims = data.getBody();
-
-            ArrayList<?> list = claims.get("roles", ArrayList.class);
-            ArrayList<Role> roles = new ArrayList<>();
-
-            for (Object el : list) {
-                if (el instanceof String string) {
-                    roles.add(Role.valueOf(string));
-                }
-            }
-
-            return new JwtUser(
-                    UUID.fromString(claims.getSubject()),
-                    claims.get("email", String.class),
-                    roles
-            );
+            return UUID.fromString(claims.getSubject());
         } catch (Exception exception) {
             throw new UnauthorizedException("Unauthorized", exception);
         }
+    }
+
+    private Key getSignKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
