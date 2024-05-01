@@ -20,11 +20,11 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDto getUserById(UUID id) {
-        var user = findUser(id);
+        var user = getUserEntityById(id);
         return userMapper.entityToDto(user);
     }
 
-    private UserEntity findUser(UUID id) {
+    public UserEntity getUserEntityById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found", id)));
     }

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
@@ -39,9 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             String token = authorizationValue.substring(7);
-            var jwtUser = jwtService.decodeAccessToken(token);
-            Authentication authentication = new JwtAuthenticationToken(jwtUser);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            var authenticationToken = jwtService.getAuthenticationToken(token);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (Exception exception) {
             log.error("Exception at jwt filter", exception);
             sendError(response);
