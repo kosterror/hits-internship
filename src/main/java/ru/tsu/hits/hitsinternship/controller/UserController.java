@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
+import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.service.UserService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -37,6 +36,14 @@ public class UserController {
     @GetMapping
     public UserDto getUser() {
         return userService.getUserById(SecurityUtil.extractId());
+    }
+
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PutMapping("/{id}/roles")
+    @Operation(summary = "Изменить роли пользователя",
+            security = @SecurityRequirement(name = "Bearer Authentication"))
+    public UserDto updateUserRoles(@PathVariable UUID id, @RequestBody Set<Role> roles) {
+        return userService.updateUserRoles(id, roles);
     }
 
 }

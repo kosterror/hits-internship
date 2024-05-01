@@ -9,7 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class JwtService {
 

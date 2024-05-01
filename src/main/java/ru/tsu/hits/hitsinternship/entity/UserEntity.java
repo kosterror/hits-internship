@@ -35,7 +35,7 @@ public class UserEntity {
     private List<String> refreshTokens;
 
     @Enumerated(EnumType.STRING)
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     private List<Role> roles;

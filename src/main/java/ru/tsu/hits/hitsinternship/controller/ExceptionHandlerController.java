@@ -24,17 +24,6 @@ import java.util.List;
 @ControllerAdvice
 public class ExceptionHandlerController {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleException(HttpServletRequest request,
-                                                    Exception exception
-    ) {
-        logException(request, exception);
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiError("Internal service error"));
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationException(HttpServletRequest request,
                                                               MethodArgumentNotValidException exception) {
@@ -117,6 +106,17 @@ public class ExceptionHandlerController {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(HttpServletRequest request,
+                                                    Exception exception
+    ) {
+        logException(request, exception);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiError("Internal service error"));
     }
 
     private void logException(HttpServletRequest request, Exception exception) {
