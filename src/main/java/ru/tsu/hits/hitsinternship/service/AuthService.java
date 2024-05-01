@@ -3,12 +3,15 @@ package ru.tsu.hits.hitsinternship.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
+import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.repository.UserRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,10 +59,27 @@ public class AuthService {
         }
     }
 
+    public void registerStudents(List<NewStudentDto> newStudentDtos) {
+        for (NewStudentDto dto : newStudentDtos) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new ConflictException("User with this email already exists");
+            }
+
+            var user = UserEntity.builder()
+                    .fullName(dto.getFullName())
+                    .email(dto.getEmail())
+                    .isActive(false)
+                    .roles(List.of(Role.STUDENT))
+                    .build();
+
+            userRepository.save(user);
+            emailService.sendActivationLink(user);
+        }
+    }
+
     private UserEntity findUser(UUID userId) {
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> new NotFoundException("User " + userId + " not found"));
     }
-
 }
