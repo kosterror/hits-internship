@@ -43,4 +43,8 @@ dependencies {
     implementation "org.hibernate.orm:hibernate-jpamodelgen:${jpaModelGenVersion}"
     annotationProcessor "org.hibernate.orm:hibernate-jpamodelgen:${jpaModelGenVersion}"
     compileOnly "org.hibernate.orm:hibernate-jpamodelgen:${jpaModelGenVersion}"
+
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 }

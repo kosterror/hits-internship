@@ -29,6 +29,11 @@ public class UserEntity {
 
     private Boolean isActive;
 
+    @ElementCollection
+    @CollectionTable(name = "user_refresh_token", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "refresh_token")
+    private List<String> refreshTokens;
+
     @Enumerated(EnumType.STRING)
     @ElementCollection
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

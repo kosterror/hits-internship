@@ -13,3 +13,9 @@ create table user_role
     user_id uuid references user_ (id) on delete cascade,
     role    varchar(255)
 );
+
+create table user_refresh_token
+(
+    user_id       uuid          not null references user_ (id) on delete cascade,
+    refresh_token varchar(1024) not null
+);
