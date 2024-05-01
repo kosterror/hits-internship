@@ -18,3 +18,9 @@ spring:
 
 application:
   url: http://localhost:8080
+  jwt:
+    secret: ${JWT_SECRET:SecretKeyForJwtSecretKeyForJwtSecretKeyForJwtSecretKeyForJwt}
+    access:
+      expiration-min: ${JWT_EXPIRATION:15}
+    refresh:
+      expiration-days: ${JWT_REFRESH_EXPIRATION:7}

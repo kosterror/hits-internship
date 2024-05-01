@@ -3,6 +3,8 @@ package ru.tsu.hits.hitsinternship.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.tsu.hits.hitsinternship.dto.auth.LoginDto;
+import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
@@ -20,6 +22,7 @@ public class AuthService {
 
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     @Transactional
     public void register(NewUserDto dto) {
@@ -81,5 +84,19 @@ public class AuthService {
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> new NotFoundException("User " + userId + " not found"));
+    }
+
+    public TokensDto login(LoginDto loginDto) {
+        var user = userRepository
+                .findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new NotFoundException("User " + loginDto.getEmail() + " not found"));
+
+        //TODO: проверить пароль и активирован ли аккаунт
+
+        var tokens = jwtService.generateTokens(user);
+        user.getRefreshTokens().add(tokens.getRefreshToken());
+        userRepository.save(user);
+
+        return tokens;
     }
 }
