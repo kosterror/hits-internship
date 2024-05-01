@@ -11,7 +11,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Data
 public class LoginDto {
 
-    @Schema(description = "ФИО", requiredMode = REQUIRED, example = "DEAN_OFFICER")
+    @Schema(description = "ФИО", requiredMode = REQUIRED, example = "change-me@domain.com")
     @Pattern(regexp = ValidationRegexes.EMAIL_REGEX, message = "Invalid email")
     @NotBlank(message = "Email is required")
     private String email;
