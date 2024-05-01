@@ -22,14 +22,14 @@ public class SpecialityController {
 
     private final SpecialityService specialityService;
 
-    @Operation(summary = "Создать специальность", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Создать специальность", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
     @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
     public SpecialityDto createSpeciality(@Valid @RequestBody NewSpecialityDto newSpecialityDto) {
         return specialityService.createSpeciality(newSpecialityDto);
     }
 
-    @Operation(summary = "Удалить специальность", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Удалить специальность", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{specialityId}")
     @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
     public void deleteSpeciality(@Valid @PathVariable UUID specialityId) {

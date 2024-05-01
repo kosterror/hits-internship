@@ -23,14 +23,14 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @Operation(summary = "Создать группу", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Создать группу", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     public GroupDto createGroup(@Valid @RequestBody NewGroupDto newGroupDto) {
         return groupService.createGroup(newGroupDto);
     }
 
-    @Operation(summary = "Удалить группу", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Удалить группу", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{groupId}")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     public void deleteGroup(@PathVariable UUID groupId) {

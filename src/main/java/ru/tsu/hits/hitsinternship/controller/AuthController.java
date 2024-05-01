@@ -26,14 +26,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Регистрация пользователя", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Регистрация пользователя", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/register")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     public void register(@Valid @RequestBody NewUserDto newUserDto) {
         authService.register(newUserDto);
     }
 
-    @Operation(summary = "Регистрация студентов", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Регистрация студентов", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/register-students")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     public void registerStudents(@Valid @RequestBody List<NewStudentDto> newStudentDtos) {

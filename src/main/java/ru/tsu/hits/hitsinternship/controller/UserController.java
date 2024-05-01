@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Получить пользователя по id",
-            security = @SecurityRequirement(name = "Bearer Authentication")
+            security = @SecurityRequirement(name = "BearerAuth")
     )
     @PreAuthorize("hasAnyRole('CURATOR', 'DEAN_OFFICER', 'COMPANY_OFFICER')")
     @GetMapping("/{id}")
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @Operation(summary = "Получить информацию о себе",
-            security = @SecurityRequirement(name = "Bearer Authentication"))
+            security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public UserDto getUser() {
         return userService.getUserById(SecurityUtil.extractId());
@@ -41,7 +41,7 @@ public class UserController {
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     @PutMapping("/{id}/roles")
     @Operation(summary = "Изменить роли пользователя",
-            security = @SecurityRequirement(name = "Bearer Authentication"))
+            security = @SecurityRequirement(name = "BearerAuth"))
     public UserDto updateUserRoles(@PathVariable UUID id, @RequestBody Set<Role> roles) {
         return userService.updateUserRoles(id, roles);
     }
