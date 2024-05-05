@@ -31,4 +31,8 @@ public class CompanyWishesEntity {
     @ManyToOne
     @JoinColumn(name = "speciality_id")
     private SpecialityEntity speciality;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company;
 }
