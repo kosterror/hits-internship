@@ -29,10 +29,27 @@ public class CompanyWishesService {
 
     public CompanyWishDto createCompanyWish(NewCompanyWishDto newCompanyWishDto) {
 
-        CompanyWishesEntity companyWishes = companyWishesMapper.newDtoToEntity(newCompanyWishDto);
+        var company = companyRepository.findById(newCompanyWishDto.getCompanyId())
+                .orElseThrow(() -> new NotFoundException("Компании с таким id не существует"));
 
-        companyWishesRepository.save(companyWishes);
-        return companyWishesMapper.entityToDto(companyWishes);
+        var speciality = specialityRepository.findById(newCompanyWishDto.getSpecialityId())
+                .orElseThrow(() -> new NotFoundException("Специальности с таким id не существует"));
+
+        CompanyWishesEntity companyWish = companyWishesMapper.newDtoToEntity(newCompanyWishDto);
+
+        if (newCompanyWishDto.getProgramLanguageId() != null) {
+            var programLanguage = programLanguageRepository.findById(newCompanyWishDto.getProgramLanguageId())
+                    .orElseThrow(() -> new NotFoundException("Языка программирования с таким id не существует"));
+
+            companyWish.setProgramLanguage(programLanguage);
+        }
+
+        companyWish.setCompany(company);
+
+        companyWish.setSpeciality(speciality);
+
+        companyWishesRepository.save(companyWish);
+        return companyWishesMapper.entityToDto(companyWish);
     }
 
     public void deleteCompanyWish(UUID companyWishId) {
@@ -50,14 +67,17 @@ public class CompanyWishesService {
         var company = companyRepository.findById(newCompanyWishDto.getCompanyId())
                 .orElseThrow(() -> new NotFoundException("Компании с таким id не существует"));
 
-        var programLanguage = programLanguageRepository.findById(newCompanyWishDto.getProgramLanguageId())
-                .orElseThrow(() -> new NotFoundException("Языка программирования с таким id не существует"));
+        if (newCompanyWishDto.getProgramLanguageId() != null) {
+            var programLanguage = programLanguageRepository.findById(newCompanyWishDto.getProgramLanguageId())
+                    .orElseThrow(() -> new NotFoundException("Языка программирования с таким id не существует"));
+
+            companyWish.setProgramLanguage(programLanguage);
+        }
 
         var speciality = specialityRepository.findById(newCompanyWishDto.getSpecialityId())
                 .orElseThrow(() -> new NotFoundException("Специальности с таким id не существует"));
 
         companyWish.setCompany(company);
-        companyWish.setProgramLanguage(programLanguage);
         companyWish.setSpeciality(speciality);
         companyWish.setInternAmount(newCompanyWishDto.getInternAmount());
         companyWish.setComment(newCompanyWishDto.getComment());
@@ -73,4 +93,5 @@ public class CompanyWishesService {
                 .map(companyWishesMapper::entityToDto)
                 .toList();
     }
+
 }
