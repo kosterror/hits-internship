@@ -44,4 +44,6 @@ public class UserEntity {
     @JoinColumn(name = "group_id")
     private GroupEntity group;
 
+    @OneToMany(mappedBy = "user")
+    private List<PositionEntity> positions;
 }
