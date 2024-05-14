@@ -26,8 +26,8 @@ public class NewUserDto {
     private String email;
 
     @Schema(description = "Роль", requiredMode = REQUIRED)
-    @NotNull(message = "Role is required")
-    @Size(min = 1, message = "Role is required")
-    private List<Role> role;
+    @NotNull(message = "Roles is required")
+    @Size(min = 1, message = "Roles is required")
+    private List<Role> roles;
 
 }

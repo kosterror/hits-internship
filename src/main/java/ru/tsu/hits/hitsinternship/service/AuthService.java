@@ -39,7 +39,7 @@ public class AuthService {
                 .fullName(dto.getFullName())
                 .email(dto.getEmail())
                 .isActive(false)
-                .roles(dto.getRole())
+                .roles(dto.getRoles())
                 .build();
 
         user = userRepository.save(user);
