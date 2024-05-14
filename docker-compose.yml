@@ -11,6 +11,8 @@ services:
       - DB_URL=jdbc:postgresql://hi-db:5432/hits-internship
       - DB_USERNAME=hits-internship
       - DB_PASSWORD=hits-internship
+    env_file:
+      - .env
   hi-db:
     extends:
       file: docker-compose.dev.yml
