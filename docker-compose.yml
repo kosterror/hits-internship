@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     depends_on:
       - hi-db
+      - hi-minio
     environment:
       - DB_URL=jdbc:postgresql://hi-db:5432/hits-internship
       - DB_USERNAME=hits-internship
@@ -14,6 +15,11 @@ services:
     extends:
       file: docker-compose.dev.yml
       service: hi-db
+  hi-minio:
+    extends:
+      file: docker-compose.dev.yml
+      service: hi-minio
 
 volumes:
   hi-db: { }
+  hi-minio: { }
