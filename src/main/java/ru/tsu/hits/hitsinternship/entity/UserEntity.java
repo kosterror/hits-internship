@@ -44,4 +44,7 @@ public class UserEntity {
     @JoinColumn(name = "group_id")
     private GroupEntity group;
 
+    @OneToMany(mappedBy = "owner")
+    private List<FileMetaInfoEntity> files;
+
 }
