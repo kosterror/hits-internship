@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.service.UserService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,6 +46,19 @@ public class UserController {
             security = @SecurityRequirement(name = "BearerAuth"))
     public UserDto updateUserRoles(@PathVariable UUID id, @RequestBody Set<Role> roles) {
         return userService.updateUserRoles(id, roles);
+    }
+
+    @Operation(summary = "Получить список всех пользователей",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
+    public PaginationResponse<UserDto> getUsers(@RequestParam(required = false) String fullName,
+                                                @RequestParam(required = false) Boolean isActive,
+                                                @RequestParam(required = false) List<Role> roles,
+                                                @RequestParam(required = false) List<UUID> groupIds,
+                                                @RequestParam(defaultValue = "0") int pageNumber,
+                                                @RequestParam(defaultValue = "50") int pageSize) {
+        return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);
     }
 
 }
