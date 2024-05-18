@@ -46,4 +46,8 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private List<PositionEntity> positions;
+
+    @OneToMany(mappedBy = "owner")
+    private List<FileMetaInfoEntity> files;
+
 }

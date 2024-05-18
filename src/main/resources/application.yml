@@ -2,7 +2,7 @@ spring:
   application:
     name: hits-internship
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/hits-internship}
+    url: ${DB_URL:jdbc:postgresql://hi-db:5432/hits-internship}
     username: ${DB_USERNAME:hits-internship}
     password: ${DB_PASSWORD:hits-internship}
   jpa:
@@ -15,6 +15,10 @@ spring:
     password: ${EMAIL_PASSWORD}
     port: 465
     protocol: smtps
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 application:
   url: http://localhost:8080
@@ -34,3 +38,9 @@ security:
         method: GET
       - pattern: /api/v1/groups
         method: GET
+
+minio:
+  access-key: ${MINIO_ACCESS_KEY:hits-admin}
+  secret-key: ${MINIO_SECRET_KEY:hits-admin}
+  bucket: ${MINIO_BUCKET:hits-internship}
+  url: ${MINIO_URL:http://hi-minio:9000}

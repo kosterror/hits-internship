@@ -10,6 +10,18 @@ services:
       - "5432:5432"
     volumes:
       - hi-db:/var/lib/postgresql/data
+  hi-minio:
+    container_name: hi-minio
+    image: bitnami/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: hits-admin
+      MINIO_ROOT_PASSWORD: hits-admin
+    volumes:
+      - hi-minio:/data
 
 volumes:
   hi-db: { }
+  hi-minio: { }
