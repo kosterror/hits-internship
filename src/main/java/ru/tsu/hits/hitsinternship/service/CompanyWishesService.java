@@ -33,7 +33,7 @@ public class CompanyWishesService {
 
     public void deleteCompanyWish(UUID companyWishId) {
         if (!companyWishesRepository.existsById(companyWishId)) {
-            throw new NotFoundException("");
+            throw new NotFoundException("companyWish with id " + companyWishId + " not found");
         }
         companyWishesRepository.deleteById(companyWishId);
     }
@@ -85,17 +85,17 @@ public class CompanyWishesService {
                 .toList();
     }
 
-    private CompanyEntity findCompanyById(UUID companyId) {
+    public CompanyEntity findCompanyById(UUID companyId) {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new NotFoundException("Компании с таким id не существует"));
     }
 
-    private SpecialityEntity findSpecialityById(UUID specialityId) {
+    public SpecialityEntity findSpecialityById(UUID specialityId) {
         return specialityRepository.findById(specialityId)
                 .orElseThrow(() -> new NotFoundException("Специальности с таким id не существует"));
     }
 
-    private ProgramLanguageEntity findProgramLanguageById(UUID programLanguageId) {
+    public ProgramLanguageEntity findProgramLanguageById(UUID programLanguageId) {
         return programLanguageRepository.findById(programLanguageId)
                 .orElseThrow(() -> new NotFoundException("Языка программирования с таким id не существует"));
     }

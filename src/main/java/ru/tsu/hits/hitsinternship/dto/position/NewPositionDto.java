@@ -1,9 +1,11 @@
 package ru.tsu.hits.hitsinternship.dto.position;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.tsu.hits.hitsinternship.entity.PositionStatus;
 
 import java.util.UUID;
 
@@ -12,15 +14,15 @@ import java.util.UUID;
 @Data
 public class NewPositionDto {
 
-    private UUID id;
-
+    @NotNull
     private Integer priority;
 
+    @NotNull
+    private PositionStatus positionStatus;
+
     private UUID programLanguageId;
-
+    @NotNull
     private UUID specialityId;
-
+    @NotNull
     private UUID companyId;
-
-    private UUID userId;
 }

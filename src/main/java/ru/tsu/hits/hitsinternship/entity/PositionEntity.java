@@ -22,7 +22,7 @@ public class PositionEntity {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    private PostionStatus positionStatus;
+    private PositionStatus positionStatus;
 
     private Integer priority;
 

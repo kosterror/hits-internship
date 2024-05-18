@@ -7,7 +7,7 @@ import ru.tsu.hits.hitsinternship.dto.company.CompanyDto;
 import ru.tsu.hits.hitsinternship.dto.programLanguage.ProgramLanguageDto;
 import ru.tsu.hits.hitsinternship.dto.specialties.SpecialityDto;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
-import ru.tsu.hits.hitsinternship.entity.PostionStatus;
+import ru.tsu.hits.hitsinternship.entity.PositionStatus;
 
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public class PositionDto {
 
     private UUID id;
 
-    private PostionStatus positionStatus;
+    private PositionStatus positionStatus;
 
     private Integer priority;
 
