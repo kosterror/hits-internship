@@ -2,7 +2,6 @@ package ru.tsu.hits.hitsinternship.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -12,9 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.tsu.hits.hitsinternship.dto.api.ApiError;
-import ru.tsu.hits.hitsinternship.exception.ConflictException;
-import ru.tsu.hits.hitsinternship.exception.NotFoundException;
-import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
+import ru.tsu.hits.hitsinternship.exception.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +63,12 @@ public class ExceptionHandlerController {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbiddenException(ForbiddenException exception
+    ) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(NotFoundException.class)
