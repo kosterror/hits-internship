@@ -44,6 +44,7 @@ public class PositionService {
 
     public PositionDto createPosition(NewPositionDto newPositionDto, UUID userId) {
 
+        checkPositionStatus(newPositionDto.getPositionStatus());
         checkOriginality(newPositionDto, userId);
         var company = companyWishesService.findCompanyById(newPositionDto.getCompanyId());
         var speciality = companyWishesService.findSpecialityById(newPositionDto.getSpecialityId());
@@ -73,6 +74,7 @@ public class PositionService {
     public PositionDto updatePositionStatus(UUID positionId, PositionStatus positionStatus, UUID userId) {
 
         checkPermission(userId, positionId);
+        checkPositionStatus(positionStatus);
         var position = findPositionById(positionId);
         position.setPositionStatus(positionStatus);
         positionRepository.save(position);
@@ -84,6 +86,13 @@ public class PositionService {
         checkPermission(userId, positionId);
         var position = findPositionById(positionId);
         position.setPriority(positionPriority);
+        positionRepository.save(position);
+        return positionMapper.entityToDto(position);
+    }
+
+    public PositionDto confirmReceivedOffer(UUID positionId) {
+        var position = findPositionById(positionId);
+        position.setPositionStatus(PositionStatus.CONFIRMED_RECEIVED_OFFER);
         positionRepository.save(position);
         return positionMapper.entityToDto(position);
     }
@@ -125,6 +134,12 @@ public class PositionService {
             ) {
                 throw new BadRequestException("You already have a position with such parameters");
             }
+        }
+    }
+
+    private void checkPositionStatus(PositionStatus positionStatus) {
+        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER) {
+            throw new BadRequestException("You can't set this position status");
         }
     }
 

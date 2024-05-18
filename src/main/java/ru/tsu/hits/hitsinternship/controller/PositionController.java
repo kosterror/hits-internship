@@ -60,4 +60,12 @@ public class PositionController {
         return positionService.getStudentPositions(userId, SecurityUtil.extractId());
     }
 
+
+    @Operation(summary = "Подтвердить получение оффера", security = @SecurityRequirement(name = "BearerAuth"))
+    @PostMapping("/{positionId}/confirm-received-offer")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    public PositionDto confirmReceivedOffer(@PathVariable UUID positionId) {
+        return positionService.confirmReceivedOffer(positionId);
+    }
+
 }
