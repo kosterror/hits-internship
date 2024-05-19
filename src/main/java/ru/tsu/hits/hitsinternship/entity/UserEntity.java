@@ -50,4 +50,13 @@ public class UserEntity {
     @OneToMany(mappedBy = "owner")
     private List<FileMetaInfoEntity> files;
 
+    @OneToMany(mappedBy = "user")
+    private List<PracticeEntity> practices;
+
+    @OneToMany(mappedBy = "author")
+    private List<ChangePracticeApplication> changePracticeApplications;
+
+    @OneToMany(mappedBy = "checkingEmployee")
+    private List<ChangePracticeApplication> checkedChangePracticeApplications;
+
 }
