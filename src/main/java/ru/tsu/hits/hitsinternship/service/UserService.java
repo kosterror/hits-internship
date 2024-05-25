@@ -30,6 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final GroupService groupService;
 
     public UserDto getUserById(UUID id) {
         var user = getUserEntityById(id);
@@ -82,5 +83,15 @@ public class UserService {
                 .pageSize(pageSize)
                 .elements(userDtos)
                 .build();
+    }
+
+    public UserDto updateUserGroup(UUID id, UUID groupId) {
+        var user = getUserEntityById(id);
+        var group = groupService.getGroupEntity(groupId);
+
+        user.setGroup(group);
+        user = userRepository.save(user);
+
+        return userMapper.entityToDto(user);
     }
 }

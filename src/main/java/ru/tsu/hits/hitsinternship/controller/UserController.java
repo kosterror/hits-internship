@@ -49,6 +49,14 @@ public class UserController {
         return userService.updateUserRoles(id, roles);
     }
 
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PutMapping("/{id}/group")
+    @Operation(summary = "Изменить группу пользователя",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    public UserDto updateUserGroup(@PathVariable UUID id, @RequestBody UUID groupId) {
+        return userService.updateUserGroup(id, groupId);
+    }
+
     @Operation(summary = "Получить список всех пользователей",
             security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/all")
