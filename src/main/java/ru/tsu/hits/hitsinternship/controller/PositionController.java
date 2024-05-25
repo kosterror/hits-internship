@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
@@ -15,6 +16,8 @@ import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/api/v1/positions")
@@ -46,11 +49,13 @@ public class PositionController {
         return positionService.updatePositionPriority(positionId, positionPriority, SecurityUtil.extractId());
     }
 
+    @ResponseStatus(NO_CONTENT)
     @Operation(summary = "Удалить позицию", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{positionId}")
     @PreAuthorize("hasRole('STUDENT')")
-    public void deletePosition(@PathVariable UUID positionId) {
+    public ResponseEntity<Void> deletePosition(@PathVariable UUID positionId) {
         positionService.deletePosition(positionId, SecurityUtil.extractId());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Получить позиции студента", security = @SecurityRequirement(name = "BearerAuth"))
