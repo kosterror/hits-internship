@@ -29,6 +29,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final GroupService groupService;
 
     @Transactional
     public void register(NewUserDto dto) {
@@ -70,12 +71,12 @@ public class AuthService {
     }
 
     public void registerStudents(CreateStudentsRequest request) {
-        //TODO: получить группу для студента
+        var group = groupService.getGroupEntity(request.getGroupId());
         var newStudentDtos = request.getStudents();
 
         for (NewStudentDto dto : newStudentDtos) {
             if (userRepository.existsByEmail(dto.getEmail())) {
-                throw new ConflictException(String.format("User with email %s already exists", dto.getEmail()));
+                throw new ConflictException("User with email %s already exists".formatted(dto.getEmail()));
             }
 
             var user = UserEntity.builder()
@@ -83,6 +84,7 @@ public class AuthService {
                     .email(dto.getEmail())
                     .isActive(false)
                     .roles(List.of(Role.STUDENT))
+                    .group(group)
                     .build();
 
             userRepository.save(user);

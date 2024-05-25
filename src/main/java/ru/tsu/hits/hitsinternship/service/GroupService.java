@@ -28,7 +28,6 @@ public class GroupService {
 
     @Transactional
     public void deleteGroup(UUID groupId) {
-
         if (!groupRepository.existsById(groupId)) {
             throw new NotFoundException(String.format("Group with id %s not found", groupId));
         }
@@ -40,6 +39,12 @@ public class GroupService {
                 .map(groupMapper::entityToDto)
                 .toList();
     }
+
+    public GroupEntity getGroupEntity(UUID groupId) {
+        return groupRepository.findById(groupId)
+                .orElseThrow(() -> new NotFoundException(String.format("Group with id %s not found", groupId)));
+    }
+
 }
 
 
