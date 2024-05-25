@@ -15,7 +15,6 @@ public class NewCompanyDto {
     @NotNull
     private String name;
 
-    @NotNull
     private String websiteLink;
 
     @NotNull
