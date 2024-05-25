@@ -35,6 +35,7 @@ public class UserController {
 
     @Operation(summary = "Получить информацию о себе",
             security = @SecurityRequirement(name = "BearerAuth"))
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public UserDto getUser() {
         return userService.getUserById(SecurityUtil.extractId());
@@ -51,7 +52,6 @@ public class UserController {
     @Operation(summary = "Получить список всех пользователей",
             security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public PaginationResponse<UserDto> getUsers(@RequestParam(required = false) String fullName,
                                                 @RequestParam(required = false) Boolean isActive,
                                                 @RequestParam(required = false) List<Role> roles,
