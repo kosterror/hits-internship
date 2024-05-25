@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.group.GroupDto;
@@ -14,6 +15,8 @@ import ru.tsu.hits.hitsinternship.service.GroupService;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -30,11 +33,13 @@ public class GroupController {
         return groupService.createGroup(newGroupDto);
     }
 
+    @ResponseStatus(NO_CONTENT)
     @Operation(summary = "Удалить группу", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{groupId}")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
-    public void deleteGroup(@PathVariable UUID groupId) {
+    public ResponseEntity<Void> deleteGroup(@PathVariable UUID groupId) {
         groupService.deleteGroup(groupId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Получить список групп")

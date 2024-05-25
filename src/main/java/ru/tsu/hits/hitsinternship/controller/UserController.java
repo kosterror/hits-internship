@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -70,6 +72,8 @@ public class UserController {
         return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);
     }
 
+
+    @ResponseStatus(NO_CONTENT)
     @Operation(summary = "Изменить пароль", security = @SecurityRequirement(name = "BearerAuth"))
     @PutMapping("/password")
     public ResponseEntity<Void> changePassword(@RequestParam String password) {

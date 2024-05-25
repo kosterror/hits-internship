@@ -15,6 +15,8 @@ import ru.tsu.hits.hitsinternship.service.SemesterService;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 @RestController
 @RequestMapping("/api/v1/semesters")
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class SemesterController {
         return semesterService.getSemesters();
     }
 
+    @ResponseStatus(NO_CONTENT)
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     @Operation(summary = "Удалить семестр", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{id}")
