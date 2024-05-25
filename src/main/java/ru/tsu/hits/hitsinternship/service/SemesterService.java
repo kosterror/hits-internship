@@ -33,7 +33,10 @@ public class SemesterService {
     }
 
     public List<SemesterDto> getSemesters() {
-        return semesterRepository.findAll(Sort.by(Sort.Direction.ASC, SemesterEntity_.STUDY_YEAR, SemesterEntity_.NUMBER))
+        return semesterRepository.findAll(Sort.by(Sort.Direction.ASC,
+                        SemesterEntity_.STUDY_YEAR,
+                        SemesterEntity_.NUMBER)
+                )
                 .stream()
                 .map(semesterMapper::entityToDto)
                 .toList();
@@ -46,5 +49,17 @@ public class SemesterService {
     public SemesterEntity getSemesterEntity(UUID id) {
         return semesterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Semester with id %s not found".formatted(id)));
+    }
+
+    public SemesterDto updateSemester(UUID id, NewSemesterDto newSemesterDto) {
+        var entity = getSemesterEntity(id);
+        entity.setNumber(newSemesterDto.getNumber());
+        entity.setStudyYear(newSemesterDto.getStudyYear());
+        entity.setStartDate(newSemesterDto.getStartDate());
+        entity.setEndDate(newSemesterDto.getEndDate());
+        entity.setChangeCompanyApplicationDeadline(newSemesterDto.getChangeCompanyApplicationDeadline());
+
+        entity = semesterRepository.save(entity);
+        return semesterMapper.entityToDto(entity);
     }
 }
