@@ -1,4 +1,4 @@
-package ru.tsu.hits.hitsinternship.dto.companyWishes;
+package ru.tsu.hits.hitsinternship.dto.companywishes;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

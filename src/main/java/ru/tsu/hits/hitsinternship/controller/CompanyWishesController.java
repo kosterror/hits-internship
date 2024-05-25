@@ -7,8 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.tsu.hits.hitsinternship.dto.companyWishes.CompanyWishDto;
-import ru.tsu.hits.hitsinternship.dto.companyWishes.NewCompanyWishDto;
+import ru.tsu.hits.hitsinternship.dto.companywishes.CompanyWishDto;
+import ru.tsu.hits.hitsinternship.dto.companywishes.NewCompanyWishDto;
 import ru.tsu.hits.hitsinternship.service.CompanyWishesService;
 
 import java.util.List;

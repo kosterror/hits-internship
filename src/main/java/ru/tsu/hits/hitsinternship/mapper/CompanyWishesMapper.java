@@ -4,8 +4,8 @@ package ru.tsu.hits.hitsinternship.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
-import ru.tsu.hits.hitsinternship.dto.companyWishes.CompanyWishDto;
-import ru.tsu.hits.hitsinternship.dto.companyWishes.NewCompanyWishDto;
+import ru.tsu.hits.hitsinternship.dto.companywishes.CompanyWishDto;
+import ru.tsu.hits.hitsinternship.dto.companywishes.NewCompanyWishDto;
 import ru.tsu.hits.hitsinternship.entity.CompanyWishesEntity;
 
 @Mapper(

@@ -1,10 +1,10 @@
-package ru.tsu.hits.hitsinternship.dto.companyWishes;
+package ru.tsu.hits.hitsinternship.dto.companywishes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.tsu.hits.hitsinternship.dto.company.CompanyDto;
-import ru.tsu.hits.hitsinternship.dto.programLanguage.ProgramLanguageDto;
+import ru.tsu.hits.hitsinternship.dto.programlanguage.ProgramLanguageDto;
 import ru.tsu.hits.hitsinternship.dto.specialties.SpecialityDto;
 
 import java.util.UUID;

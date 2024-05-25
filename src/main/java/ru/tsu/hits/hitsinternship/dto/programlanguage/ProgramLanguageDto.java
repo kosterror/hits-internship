@@ -1,4 +1,4 @@
-package ru.tsu.hits.hitsinternship.dto.programLanguage;
+package ru.tsu.hits.hitsinternship.dto.programlanguage;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
