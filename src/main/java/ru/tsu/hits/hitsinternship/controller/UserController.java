@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
@@ -67,6 +68,13 @@ public class UserController {
                                                 @RequestParam(defaultValue = "0") int pageNumber,
                                                 @RequestParam(defaultValue = "50") int pageSize) {
         return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);
+    }
+
+    @Operation(summary = "Изменить пароль", security = @SecurityRequirement(name = "BearerAuth"))
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(@RequestParam String password) {
+        userService.changePassword(SecurityUtil.extractId(), password);
+        return ResponseEntity.noContent().build();
     }
 
 }
