@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.auth.LoginDto;
 import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
+import ru.tsu.hits.hitsinternship.dto.user.CreateStudentsRequest;
 import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
@@ -68,7 +69,10 @@ public class AuthService {
         }
     }
 
-    public void registerStudents(List<NewStudentDto> newStudentDtos) {
+    public void registerStudents(CreateStudentsRequest request) {
+        //TODO: получить группу для студента
+        var newStudentDtos = request.getStudents();
+
         for (NewStudentDto dto : newStudentDtos) {
             if (userRepository.existsByEmail(dto.getEmail())) {
                 throw new ConflictException(String.format("User with email %s already exists", dto.getEmail()));

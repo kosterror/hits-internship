@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.tsu.hits.hitsinternship.dto.dto.FileMetaInfoDto;
+import ru.tsu.hits.hitsinternship.dto.filemetainfo.FileMetaInfoDto;
 import ru.tsu.hits.hitsinternship.service.FileStorageService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 

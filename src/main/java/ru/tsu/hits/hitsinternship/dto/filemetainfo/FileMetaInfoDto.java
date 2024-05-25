@@ -1,4 +1,4 @@
-package ru.tsu.hits.hitsinternship.dto.dto;
+package ru.tsu.hits.hitsinternship.dto.filemetainfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
