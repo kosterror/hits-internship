@@ -43,7 +43,7 @@ public class SemesterService {
         semesterRepository.deleteById(id);
     }
 
-    private SemesterEntity getSemesterEntity(UUID id) {
+    public SemesterEntity getSemesterEntity(UUID id) {
         return semesterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Semester with id %s not found".formatted(id)));
     }

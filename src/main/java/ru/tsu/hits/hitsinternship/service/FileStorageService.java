@@ -85,6 +85,11 @@ public class FileStorageService {
                 .toList();
     }
 
+    public List<FileMetaInfoEntity> getFileMetaInfoEntities(List<UUID> fileIds) {
+        return fileMetaInfoRepository.findAllById(fileIds);
+
+    }
+
     private FileMetaInfoEntity getFileMetaInfoEntity(UUID fileId) {
         return fileMetaInfoRepository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("File with id %s not found".formatted(fileId)));
