@@ -9,13 +9,11 @@ import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
 import ru.tsu.hits.hitsinternship.entity.PositionEntity;
 import ru.tsu.hits.hitsinternship.entity.PositionStatus;
 import ru.tsu.hits.hitsinternship.entity.Role;
-import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
-import ru.tsu.hits.hitsinternship.repository.UserRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +29,7 @@ public class PositionService {
 
     private final CompanyWishesService companyWishesService;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
 
     public void deletePosition(UUID positionId, UUID userId) {
@@ -48,7 +46,7 @@ public class PositionService {
         checkOriginality(newPositionDto, userId);
         var company = companyWishesService.findCompanyById(newPositionDto.getCompanyId());
         var speciality = companyWishesService.findSpecialityById(newPositionDto.getSpecialityId());
-        var user = findUserById(userId);
+        var user = userService.getUserEntityById(userId);
         PositionEntity positionEntity = positionMapper.newDtoToEntity(newPositionDto);
 
         if (newPositionDto.getProgramLanguageId() != null) {
@@ -97,8 +95,8 @@ public class PositionService {
         return positionMapper.entityToDto(position);
     }
 
-    private void checkPermissionWithRole(UUID userId, UUID targetUserId) {
-        var user = findUserById(userId);
+    public void checkPermissionWithRole(UUID userId, UUID targetUserId) {
+        var user = userService.getUserEntityById(userId);
         if (user.getRoles().contains(Role.STUDENT)) {
             if (!targetUserId.equals(userId)) {
                 throw new ForbiddenException("You don't have permission to do this");
@@ -117,11 +115,6 @@ public class PositionService {
         return positionRepository.findById(positionId)
                 .orElseThrow(() -> new NotFoundException("Position with such id does not exist"));
 
-    }
-
-    private UserEntity findUserById(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with such id does not exist"));
     }
 
     private void checkOriginality(NewPositionDto newPositionDto, UUID userId) {
