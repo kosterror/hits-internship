@@ -19,7 +19,7 @@ public class ActivationController {
     @GetMapping("/activate/{id}")
     public String activate(@PathVariable UUID id, Model model) {
         if (!authService.canUserActivateAccount(id)) {
-            return "cannot-activate-page.html";
+            return "cannot-activate-page";
         }
 
         model.addAttribute("userId", id);

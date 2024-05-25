@@ -12,16 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.tsu.hits.hitsinternship.dto.auth.LoginDto;
 import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
-import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
+import ru.tsu.hits.hitsinternship.dto.user.CreateStudentsRequest;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
 import ru.tsu.hits.hitsinternship.service.AuthService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Регистраци, авторизация")
+@Tag(name = "Регистрация, авторизация")
 public class AuthController {
 
     private final AuthService authService;
@@ -36,8 +34,8 @@ public class AuthController {
     @Operation(summary = "Регистрация студентов", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/register-students")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
-    public void registerStudents(@Valid @RequestBody List<NewStudentDto> newStudentDtos) {
-        authService.registerStudents(newStudentDtos);
+    public void registerStudents(@Valid @RequestBody CreateStudentsRequest createStudentsRequest) {
+        authService.registerStudents(createStudentsRequest);
     }
 
     @Operation(summary = "Авторизация пользователя")

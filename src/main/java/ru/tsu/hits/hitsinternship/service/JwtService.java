@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
-import ru.tsu.hits.hitsinternship.security.JwtAuthenticationToken;
 import ru.tsu.hits.hitsinternship.security.JwtUser;
 
 import java.security.Key;
@@ -66,16 +65,14 @@ public class JwtService {
                 .compact();
     }
 
-    public JwtAuthenticationToken getAuthenticationToken(String jwtToken) {
+    public JwtUser getAuthenticationToken(String jwtToken) {
         var userId = verifyTokenAndExtractUserId(jwtToken);
         var user = userService.getUserEntityById(userId);
 
-        JwtUser jwtUser = new JwtUser(user.getId(),
+        return new JwtUser(user.getId(),
                 user.getEmail(),
                 user.getRoles()
         );
-
-        return new JwtAuthenticationToken(jwtUser);
     }
 
     private UUID verifyTokenAndExtractUserId(String token) {
