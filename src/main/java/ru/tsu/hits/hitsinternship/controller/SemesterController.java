@@ -36,6 +36,13 @@ public class SemesterController {
         return semesterService.getSemester(id);
     }
 
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @Operation(summary = "Обновить семестр", security = @SecurityRequirement(name = "BearerAuth"))
+    @PutMapping("/{id}")
+    public SemesterDto updateSemester(@PathVariable UUID id, @RequestBody @Valid NewSemesterDto newSemesterDto) {
+        return semesterService.updateSemester(id, newSemesterDto);
+    }
+
     @Operation(summary = "Получить все семестры", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public List<SemesterDto> getSemesters() {
