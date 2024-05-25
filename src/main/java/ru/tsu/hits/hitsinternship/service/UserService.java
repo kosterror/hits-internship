@@ -9,8 +9,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
+import ru.tsu.hits.hitsinternship.entity.GroupEntity_;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
+import ru.tsu.hits.hitsinternship.entity.UserEntity_;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.UserRepository;
@@ -71,7 +73,7 @@ public class UserService {
             spec = spec.and(UserSpecification.inGroupIds(groupIds));
         }
 
-        Sort sort = Sort.by("group.name", "fullName");
+        Sort sort = Sort.by(UserEntity_.GROUP + "." + GroupEntity_.NAME, UserEntity_.FULL_NAME);
         Page<UserEntity> page = userRepository.findAll(spec, PageRequest.of(pageNumber, pageSize, sort));
         List<UserDto> userDtos = page.map(userMapper::entityToDto).getContent();
 
