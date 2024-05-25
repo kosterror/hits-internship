@@ -33,8 +33,7 @@ public class CompanyService {
 
     public CompanyDto updateCompany(UUID companyId, NewCompanyDto newCompanyDto) {
 
-        CompanyEntity company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new NotFoundException("Company not found"));
+        CompanyEntity company = findCompanyById(companyId);
         company.setName(newCompanyDto.getName());
         company.setIsVisible(newCompanyDto.getIsVisible());
         company.setWebsiteLink(newCompanyDto.getWebsiteLink());
@@ -46,6 +45,11 @@ public class CompanyService {
         return companyRepository.findAll().stream()
                 .map(companyMapper::entityToDto)
                 .collect(Collectors.toList());
+    }
+
+    public CompanyEntity findCompanyById(UUID companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new NotFoundException("Company with id " + companyId + " not found"));
     }
 
 }
