@@ -54,9 +54,9 @@ public class UserEntity {
     private List<PracticeEntity> practices;
 
     @OneToMany(mappedBy = "author")
-    private List<ChangePracticeApplication> changePracticeApplications;
+    private List<ChangePracticeApplicationEntity> changePracticeApplicationEntities;
 
     @OneToMany(mappedBy = "checkingEmployee")
-    private List<ChangePracticeApplication> checkedChangePracticeApplications;
+    private List<ChangePracticeApplicationEntity> checkedChangePracticeApplicationEntities;
 
 }
