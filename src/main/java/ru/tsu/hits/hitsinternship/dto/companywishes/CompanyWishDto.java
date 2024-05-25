@@ -20,7 +20,7 @@ public class CompanyWishDto {
 
     private String comment;
 
-    private ProgramLanguageDto programLanguageId;
+    private ProgramLanguageDto programLanguage;
 
     private SpecialityDto speciality;
 
