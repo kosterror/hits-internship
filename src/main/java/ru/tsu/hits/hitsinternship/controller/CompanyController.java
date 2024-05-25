@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/company")
+@RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
 @Tag(name = "Компании")
 public class CompanyController {
