@@ -3,6 +3,7 @@ package ru.tsu.hits.hitsinternship.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,7 @@ public class SemesterController {
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     @Operation(summary = "Создать семестр", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
-    public SemesterDto createSemester(@RequestBody NewSemesterDto newSemesterDto) {
+    public SemesterDto createSemester(@RequestBody @Valid NewSemesterDto newSemesterDto) {
         return semesterService.createSemester(newSemesterDto);
     }
 
