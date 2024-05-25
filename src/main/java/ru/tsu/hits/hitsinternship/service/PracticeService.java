@@ -8,6 +8,7 @@ import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.PracticeDto;
 import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
+import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PracticeMapper;
 import ru.tsu.hits.hitsinternship.repository.PracticeRepository;
@@ -53,6 +54,7 @@ public class PracticeService {
 
     public PracticeDto createPractice(NewPracticeDto newPracticeDto) {
 
+        checkPractice(newPracticeDto);
         PracticeEntity practiceEntity = practiceMapper.newDtoToEntity(newPracticeDto);
         practiceEntity.setSemester(semesterService.getSemesterEntity(newPracticeDto.getSemesterId()));
         practiceEntity.setUser(userService.getUserEntityById(newPracticeDto.getUserId()));
@@ -61,5 +63,14 @@ public class PracticeService {
         return practiceMapper.entityToDto(practiceEntity);
     }
 
+    private void checkPractice(NewPracticeDto newPracticeDto) {
+
+        practiceRepository.findAllByUserId(userService.getUserEntityById(newPracticeDto.getUserId()).getId())
+                .forEach(practice -> {
+                    if (practice.getSemester().getId().equals(newPracticeDto.getSemesterId())) {
+                        throw new BadRequestException("User already has practice in this semester");
+                    }
+                });
+    }
 
 }
