@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.tsu.hits.hitsinternship.config.MinioProperties;
-import ru.tsu.hits.hitsinternship.dto.dto.FileMetaInfoDto;
+import ru.tsu.hits.hitsinternship.dto.filemetainfo.FileMetaInfoDto;
 import ru.tsu.hits.hitsinternship.entity.FileMetaInfoEntity;
 import ru.tsu.hits.hitsinternship.exception.InternalException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
