@@ -14,6 +14,7 @@ import ru.tsu.hits.hitsinternship.entity.ChangePracticeApplicationStatus;
 import ru.tsu.hits.hitsinternship.service.ChangePracticeApplicationService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -57,12 +58,20 @@ public class ChangePracticeApplicationController {
                 changePracticeApplicationStatus);
     }
 
-//    @Operation(summary = "Получить заявки на изменение мест практики",
-//            security = @SecurityRequirement(name = "BearerAuth"))
-//    @GetMapping
-//    @PreAuthorize("hasRole('DEAN_OFFICER')")
-//    public ChangePracticeApplicationDto getChangePracticeApplications() {
-//        return changePracticeApplicationService.getChangePracticeApplications();
-//    }
+    @Operation(summary = "Получить заявки на изменение мест практики",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    public List<ChangePracticeApplicationDto> getChangePracticeApplications() {
+        return changePracticeApplicationService.getChangePracticeApplications();
+    }
+
+    @Operation(summary = "Получить свои заявки на изменение мест практики",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/student")
+    @PreAuthorize("hasRole('STUDENT')")
+    public List<ChangePracticeApplicationDto> getStudentChangePracticeApplications() {
+        return changePracticeApplicationService.getStudentChangePracticeApplications(SecurityUtil.extractId());
+    }
 
 }

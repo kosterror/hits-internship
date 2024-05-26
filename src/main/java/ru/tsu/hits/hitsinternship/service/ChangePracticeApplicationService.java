@@ -17,7 +17,9 @@ import ru.tsu.hits.hitsinternship.repository.ChangePracticeApplicationRepository
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class ChangePracticeApplicationService {
     public void deleteChangePracticeApplication(UUID applicationId, UUID userId) {
 
         ChangePracticeApplicationEntity applicationEntity = getChangePracticeApplicationEntity(applicationId);
+        checkStatus(applicationEntity);
         positionService.checkPermissionWithRole(userId, applicationEntity.getAuthor().getId());
         changePracticeApplicationRepository.deleteById(applicationId);
     }
@@ -71,12 +74,19 @@ public class ChangePracticeApplicationService {
         return changePracticeApplicationMapper.entityToDto(application);
     }
 
-//    public ChangePracticeApplicationDto getChangePracticeApplications() {
-//
-//        changePracticeApplicationRepository.getAll();
-//
-//
-//    }
+    public List<ChangePracticeApplicationDto> getChangePracticeApplications() {
+
+        return changePracticeApplicationRepository.findAll().stream()
+                .map(changePracticeApplicationMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ChangePracticeApplicationDto> getStudentChangePracticeApplications(UUID userId) {
+
+        return changePracticeApplicationRepository.getAllByAuthor(userService.getUserEntityById(userId)).stream()
+                .map(changePracticeApplicationMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
 
     private ChangePracticeApplicationEntity getChangePracticeApplicationEntity(UUID applicationId) {
         return changePracticeApplicationRepository.findById(applicationId)
@@ -117,6 +127,13 @@ public class ChangePracticeApplicationService {
             return companyService.createCompany(newCompanyDto).getId();
         } else {
             return changePracticeApplicationEntity.getPartner().getId();
+        }
+    }
+
+    private void checkStatus(ChangePracticeApplicationEntity changePracticeApplicationEntity) {
+
+        if (!changePracticeApplicationEntity.getStatus().equals(ChangePracticeApplicationStatus.QUEUE)) {
+            throw new BadRequestException("Нельзя изменить заявку с данным статусом");
         }
     }
 
