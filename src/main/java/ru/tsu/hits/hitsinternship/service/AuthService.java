@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.auth.LoginDto;
-import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.dto.user.CreateStudentsRequest;
 import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
@@ -98,7 +97,7 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found", userId)));
     }
 
-    public TokensDto login(LoginDto loginDto) {
+    public String login(LoginDto loginDto) {
         var user = userRepository
                 .findByEmail(loginDto.getEmail())
                 .orElseThrow(
@@ -114,10 +113,6 @@ public class AuthService {
             throw new UnauthorizedException("Unauthorized");
         }
 
-        var tokens = jwtService.generateTokens(user);
-        user.getRefreshTokens().add(tokens.getRefreshToken());
-        userRepository.save(user);
-
-        return tokens;
+        return jwtService.generateToken(user);
     }
 }
