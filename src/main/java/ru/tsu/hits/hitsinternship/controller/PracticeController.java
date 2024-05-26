@@ -45,4 +45,11 @@ public class PracticeController {
     public List<PracticeDto> getStudentPractices(@PathVariable UUID userId) {
         return practiceService.getStudentPractices(SecurityUtil.extractId(), userId);
     }
+
+    @Operation(summary = "Получить места практики для семестра", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/semesters/{semesterId}/practices")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    public List<PracticeDto> getSemesterPractices(@PathVariable UUID semesterId) {
+        return practiceService.getSemesterPractices(semesterId);
+    }
 }

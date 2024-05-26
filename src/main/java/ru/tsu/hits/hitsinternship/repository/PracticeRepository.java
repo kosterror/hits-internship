@@ -1,5 +1,6 @@
 package ru.tsu.hits.hitsinternship.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
 
@@ -9,4 +10,6 @@ import java.util.UUID;
 public interface PracticeRepository extends JpaRepository<PracticeEntity, UUID> {
 
     List<PracticeEntity> findAllByUserId(UUID userId);
+
+    List<PracticeEntity> findAllBySemesterId(UUID semesterId, Sort sort);
 }
