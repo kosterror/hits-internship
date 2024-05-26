@@ -3,6 +3,7 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
@@ -53,7 +54,6 @@ public class PracticeService {
     }
 
     public PracticeDto createPractice(NewPracticeDto newPracticeDto) {
-
         checkPractice(newPracticeDto);
         PracticeEntity practiceEntity = practiceMapper.newDtoToEntity(newPracticeDto);
         practiceEntity.setSemester(semesterService.getSemesterEntity(newPracticeDto.getSemesterId()));
@@ -64,7 +64,6 @@ public class PracticeService {
     }
 
     private void checkPractice(NewPracticeDto newPracticeDto) {
-
         practiceRepository.findAllByUserId(userService.getUserEntityById(newPracticeDto.getUserId()).getId())
                 .forEach(practice -> {
                     if (practice.getSemester().getId().equals(newPracticeDto.getSemesterId())) {
@@ -73,4 +72,12 @@ public class PracticeService {
                 });
     }
 
+    public List<PracticeDto> getSemesterPractices(UUID semesterId) {
+        return practiceRepository.findAllBySemesterId(
+                        semesterId,
+                        Sort.by(Sort.Order.asc("user.fullName"))
+                ).stream()
+                .map(practiceMapper::entityToDto)
+                .toList();
+    }
 }
