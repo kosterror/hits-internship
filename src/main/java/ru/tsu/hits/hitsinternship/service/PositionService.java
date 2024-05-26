@@ -8,6 +8,7 @@ import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
 import ru.tsu.hits.hitsinternship.entity.PositionEntity;
 import ru.tsu.hits.hitsinternship.entity.PositionStatus;
+import ru.tsu.hits.hitsinternship.entity.ProgramLanguageEntity;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
@@ -134,7 +135,7 @@ public class PositionService {
         for (var position : positions) {
             if (position.getCompany().getId().equals(newPositionDto.getCompanyId()) &&
                     position.getSpeciality().getId().equals(newPositionDto.getSpecialityId()) &&
-                    checkProgramLanguage(position, newPositionDto.getProgramLanguageId())
+                    !checkProgramLanguage(position.getProgramLanguage(), newPositionDto.getProgramLanguageId())
             ) {
                 throw new BadRequestException("You already have a position with such parameters");
             }
@@ -147,12 +148,11 @@ public class PositionService {
         }
     }
 
-    private boolean checkProgramLanguage(PositionEntity position, UUID programLanguageId) {
+    private boolean checkProgramLanguage(ProgramLanguageEntity programLanguage, UUID programLanguageId) {
 
-        if (position.getProgramLanguage() != null) {
-            return position.getProgramLanguage().getId().equals(programLanguageId);
-        }
-        return true;
+        if (programLanguage != null) {
+            return programLanguage.getId().equals(programLanguageId);
+        } else return programLanguageId != null;
     }
 
     private void checkPriority(Integer priority, UUID userId) {
@@ -165,7 +165,7 @@ public class PositionService {
     }
 
     private void checkPosition(UUID userId, List<UUID> positionIdList) {
-        if (!Objects.equals(positionRepository.findAllByUserId(userId).size(), positionIdList.size()) {
+        if (!Objects.equals(positionRepository.findAllByUserId(userId).size(), positionIdList.size())) {
             throw new BadRequestException("Position list is not correct");
         }
     }
