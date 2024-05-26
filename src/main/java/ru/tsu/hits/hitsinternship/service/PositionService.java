@@ -16,6 +16,7 @@ import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -44,6 +45,7 @@ public class PositionService {
 
         checkPositionStatus(newPositionDto.getPositionStatus());
         checkOriginality(newPositionDto, userId);
+        checkPriority(newPositionDto.getPriority(), userId);
         var company = companyWishesService.findCompanyById(newPositionDto.getCompanyId());
         var speciality = companyWishesService.findSpecialityById(newPositionDto.getSpecialityId());
         var user = userService.getUserEntityById(userId);
@@ -79,13 +81,22 @@ public class PositionService {
         return positionMapper.entityToDto(position);
     }
 
-    public PositionDto updatePositionPriority(UUID positionId, Integer positionPriority, UUID userId) {
+    public List<PositionDto> updatePositionPriority(List<UUID> positionIdList, UUID userId) {
 
-        checkPermission(userId, positionId);
-        var position = findPositionById(positionId);
-        position.setPriority(positionPriority);
-        positionRepository.save(position);
-        return positionMapper.entityToDto(position);
+        checkPosition(userId, positionIdList);
+        for (UUID uuid : positionIdList) {
+            checkPermission(userId, uuid);
+        }
+        for (int i = 0; i < positionIdList.size(); i++) {
+
+            var position = findPositionById(positionIdList.get(i));
+            position.setPriority(i);
+            positionRepository.save(position);
+        }
+        return positionRepository.findAllByUserId(userId)
+                .stream()
+                .map(positionMapper::entityToDto)
+                .toList();
     }
 
     public PositionDto confirmReceivedOffer(UUID positionId) {
@@ -142,5 +153,20 @@ public class PositionService {
             return position.getProgramLanguage().getId().equals(programLanguageId);
         }
         return true;
+    }
+
+    private void checkPriority(Integer priority, UUID userId) {
+        positionRepository.findAllByUserId(userId).stream()
+                .filter(practice -> Objects.equals(practice.getPriority(), priority))
+                .findAny()
+                .ifPresent(practice -> {
+                    throw new BadRequestException("Priority " + priority + " already exists");
+                });
+    }
+
+    private void checkPosition(UUID userId, List<UUID> positionIdList) {
+        if (!Objects.equals(positionRepository.findAllByUserId(userId).size(), positionIdList.size()) {
+            throw new BadRequestException("Position list is not correct");
+        }
     }
 }
