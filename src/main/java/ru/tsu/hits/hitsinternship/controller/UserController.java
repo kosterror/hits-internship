@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
@@ -15,6 +16,8 @@ import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -49,6 +52,14 @@ public class UserController {
         return userService.updateUserRoles(id, roles);
     }
 
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PutMapping("/{id}/group")
+    @Operation(summary = "Изменить группу пользователя",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    public UserDto updateUserGroup(@PathVariable UUID id, @RequestBody UUID groupId) {
+        return userService.updateUserGroup(id, groupId);
+    }
+
     @Operation(summary = "Получить список всех пользователей",
             security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/all")
@@ -59,6 +70,15 @@ public class UserController {
                                                 @RequestParam(defaultValue = "0") int pageNumber,
                                                 @RequestParam(defaultValue = "50") int pageSize) {
         return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);
+    }
+
+
+    @ResponseStatus(NO_CONTENT)
+    @Operation(summary = "Изменить пароль", security = @SecurityRequirement(name = "BearerAuth"))
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(@RequestParam String password) {
+        userService.changePassword(SecurityUtil.extractId(), password);
+        return ResponseEntity.noContent().build();
     }
 
 }

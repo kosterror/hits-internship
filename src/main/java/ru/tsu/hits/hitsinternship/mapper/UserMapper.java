@@ -14,6 +14,7 @@ import ru.tsu.hits.hitsinternship.entity.UserEntity;
 public interface UserMapper {
 
     @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "groupId", source = "group.id")
     UserDto entityToDto(UserEntity entity);
 
 }

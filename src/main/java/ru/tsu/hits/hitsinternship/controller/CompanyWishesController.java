@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.companywishes.CompanyWishDto;
@@ -13,6 +14,8 @@ import ru.tsu.hits.hitsinternship.service.CompanyWishesService;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/api/v1/company-wishes")
@@ -36,11 +39,13 @@ public class CompanyWishesController {
         return companyWishesService.updateCompanyWish(companyWishId, newCompanyWishDto);
     }
 
+    @ResponseStatus(NO_CONTENT)
     @Operation(summary = "Удалить пожелание компании", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{companyWishId}")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
-    public void deleteCompanyWish(@PathVariable UUID companyWishId) {
+    public ResponseEntity<Void> deleteCompanyWish(@PathVariable UUID companyWishId) {
         companyWishesService.deleteCompanyWish(companyWishId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Получить пожелания компании", security = @SecurityRequirement(name = "BearerAuth"))

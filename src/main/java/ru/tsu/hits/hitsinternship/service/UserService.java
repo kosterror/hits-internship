@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
@@ -30,6 +31,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final GroupService groupService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDto getUserById(UUID id) {
         var user = getUserEntityById(id);
@@ -82,5 +85,21 @@ public class UserService {
                 .pageSize(pageSize)
                 .elements(userDtos)
                 .build();
+    }
+
+    public UserDto updateUserGroup(UUID id, UUID groupId) {
+        var user = getUserEntityById(id);
+        var group = groupService.getGroupEntity(groupId);
+
+        user.setGroup(group);
+        user = userRepository.save(user);
+
+        return userMapper.entityToDto(user);
+    }
+
+    public void changePassword(UUID uuid, String password) {
+        var user = getUserEntityById(uuid);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 }
