@@ -12,7 +12,6 @@ import ru.tsu.hits.hitsinternship.repository.CompanyRepository;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,9 +41,10 @@ public class CompanyService {
     }
 
     public List<CompanyDto> getCompanies() {
-        return companyRepository.findAll().stream()
+        return companyRepository.findAll()
+                .stream()
                 .map(companyMapper::entityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public CompanyEntity findCompanyById(UUID companyId) {

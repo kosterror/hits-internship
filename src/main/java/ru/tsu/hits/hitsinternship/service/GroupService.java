@@ -10,6 +10,7 @@ import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.GroupMapper;
 import ru.tsu.hits.hitsinternship.repository.GroupRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +44,23 @@ public class GroupService {
     public GroupEntity getGroupEntity(UUID groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new NotFoundException(String.format("Group with id %s not found", groupId)));
+    }
+
+    public List<GroupEntity> getGroups(List<UUID> groupIds) {
+        List<GroupEntity> foundGroups = groupRepository.findAllById(groupIds);
+
+        if (foundGroups.size() != groupIds.size()) {
+            List<UUID> foundGroupIds = foundGroups.stream()
+                    .map(GroupEntity::getId)
+                    .toList();
+
+            List<UUID> notFoundGroupIds = new ArrayList<>(groupIds);
+            notFoundGroupIds.removeAll(foundGroupIds);
+
+            throw new NotFoundException("Not found groups with ids: " + notFoundGroupIds);
+        }
+
+        return foundGroups;
     }
 
 }
