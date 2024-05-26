@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "change_practice_application")
-public class ChangePracticeApplication {
+public class ChangePracticeApplicationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
