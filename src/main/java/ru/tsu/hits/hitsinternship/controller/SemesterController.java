@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static ru.tsu.hits.hitsinternship.util.SecurityUtil.extractId;
 
 @RestController
 @RequestMapping("/api/v1/semesters")
@@ -58,6 +59,12 @@ public class SemesterController {
     public ResponseEntity<Void> deleteSemester(@PathVariable UUID id) {
         semesterService.deleteSemester(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Получить мои семестры", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/my")
+    public List<SemesterDto> getMySemesters() {
+        return semesterService.getMySemesters(extractId());
     }
 
 }

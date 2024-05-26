@@ -5,12 +5,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.semester.NewSemesterDto;
 import ru.tsu.hits.hitsinternship.dto.semester.SemesterDto;
+import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
 import ru.tsu.hits.hitsinternship.entity.SemesterEntity;
 import ru.tsu.hits.hitsinternship.entity.SemesterEntity_;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.SemesterMapper;
+import ru.tsu.hits.hitsinternship.repository.PracticeRepository;
 import ru.tsu.hits.hitsinternship.repository.SemesterRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ public class SemesterService {
 
     private final SemesterMapper semesterMapper;
     private final SemesterRepository semesterRepository;
+    private final PracticeRepository practiceRepository;
 
     public SemesterDto createSemester(NewSemesterDto newSemesterDto) {
         var entity = semesterMapper.dtoToEntity(newSemesterDto);
@@ -61,5 +65,16 @@ public class SemesterService {
 
         entity = semesterRepository.save(entity);
         return semesterMapper.entityToDto(entity);
+    }
+
+    public List<SemesterDto> getMySemesters(UUID userId) {
+        List<PracticeEntity> practices = practiceRepository.findAllByUserId(userId);
+
+        return practices.stream()
+                .map(PracticeEntity::getSemester)
+                .distinct()
+                .map(semesterMapper::entityToDto)
+                .sorted(Comparator.comparingInt(SemesterDto::getNumber))
+                .toList();
     }
 }
