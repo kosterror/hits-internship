@@ -45,8 +45,8 @@ public class PositionController {
     @Operation(summary = "Изменить приоритет позиции", security = @SecurityRequirement(name = "BearerAuth"))
     @PutMapping("/{positionId}/change-priority")
     @PreAuthorize("hasRole('STUDENT')")
-    public PositionDto updatePositionPriority(@Valid @PathVariable UUID positionId, @RequestBody Integer positionPriority) {
-        return positionService.updatePositionPriority(positionId, positionPriority, SecurityUtil.extractId());
+    public List<PositionDto> updatePositionPriority(@RequestBody List<UUID> positionIdList) {
+        return positionService.updatePositionPriority(positionIdList, SecurityUtil.extractId());
     }
 
     @ResponseStatus(NO_CONTENT)
