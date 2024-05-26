@@ -1,10 +1,10 @@
 package ru.tsu.hits.hitsinternship.dto.changepracticeapplication;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.tsu.hits.hitsinternship.entity.ChangePracticeApplicationStatus;
 
 import java.util.UUID;
 
@@ -18,9 +18,8 @@ public class NewApplicationDto {
 
     private String notPartner;
 
-    private ChangePracticeApplicationStatus status;
-
     private UUID companyId;
 
+    @NotNull
     private UUID semesterId;
 }

@@ -3,10 +3,10 @@ package ru.tsu.hits.hitsinternship.dto.changepracticeapplication;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.tsu.hits.hitsinternship.dto.company.CompanyDto;
+import ru.tsu.hits.hitsinternship.dto.semester.SemesterDto;
+import ru.tsu.hits.hitsinternship.dto.user.UserDto;
 import ru.tsu.hits.hitsinternship.entity.ChangePracticeApplicationStatus;
-import ru.tsu.hits.hitsinternship.entity.CompanyEntity;
-import ru.tsu.hits.hitsinternship.entity.SemesterEntity;
-import ru.tsu.hits.hitsinternship.entity.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,13 +24,13 @@ public class ChangePracticeApplicationDto {
 
     private ChangePracticeApplicationStatus status;
 
-    private CompanyEntity partner;
+    private CompanyDto partner;
 
-    private UserEntity checkingEmployee;
+    private UserDto checkingEmployee;
 
-    private UserEntity author;
+    private UserDto author;
 
-    private SemesterEntity semester;
+    private SemesterDto semester;
 
     private LocalDateTime creationDate;
 
