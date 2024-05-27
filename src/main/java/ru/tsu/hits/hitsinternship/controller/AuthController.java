@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.auth.LoginDto;
-import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.dto.user.CreateStudentsRequest;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
 import ru.tsu.hits.hitsinternship.service.AuthService;
@@ -44,7 +43,7 @@ public class AuthController {
 
     @Operation(summary = "Авторизация пользователя")
     @PostMapping("/login")
-    public TokensDto login(@Valid @RequestBody LoginDto loginDto) {
+    public String login(@Valid @RequestBody LoginDto loginDto) {
         return authService.login(loginDto);
     }
 
