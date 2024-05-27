@@ -2,7 +2,6 @@ package ru.tsu.hits.hitsinternship.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Встречи")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/meetings")
@@ -50,7 +48,7 @@ public class MeetingController {
 
     @Operation(summary = "Получить встречи")
     @GetMapping
-    public List<MeetingsGroupedByNumber> getMeetings(@RequestParam("groupIds[]") List<UUID> groupIds,
+    public List<MeetingsGroupedByNumber> getMeetings(@RequestParam List<UUID> groupIds,
                                                      @RequestParam LocalDate from,
                                                      @RequestParam LocalDate to) {
         return meetingService.getMeetings(groupIds, from, to);
