@@ -2,6 +2,7 @@ package ru.tsu.hits.hitsinternship.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import ru.tsu.hits.hitsinternship.dto.group.GroupDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class UserDto {
     @Schema(description = "Список ролей пользователя", requiredMode = REQUIRED)
     private List<Role> roles;
 
-    @Schema(description = "Идентификатор группы пользователя", requiredMode = NOT_REQUIRED)
-    private UUID groupId;
+    @Schema(description = "Группа", requiredMode = NOT_REQUIRED)
+    private GroupDto group;
 
 }
