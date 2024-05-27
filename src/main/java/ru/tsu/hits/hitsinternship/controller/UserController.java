@@ -65,8 +65,8 @@ public class UserController {
     @GetMapping("/all")
     public PaginationResponse<UserDto> getUsers(@RequestParam(required = false) String fullName,
                                                 @RequestParam(required = false) Boolean isActive,
-                                                @RequestParam(name = "roles[]", required = false) List<Role> roles,
-                                                @RequestParam(name = "groupIds[]", required = false) List<UUID> groupIds,
+                                                @RequestParam(required = false) List<Role> roles,
+                                                @RequestParam(required = false) List<UUID> groupIds,
                                                 @RequestParam(defaultValue = "0") int pageNumber,
                                                 @RequestParam(defaultValue = "50") int pageSize) {
         return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);

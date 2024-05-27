@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.tsu.hits.hitsinternship.dto.auth.TokensDto;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
 import ru.tsu.hits.hitsinternship.security.JwtUser;
@@ -25,42 +24,27 @@ import java.util.UUID;
 public class JwtService {
 
     @Value("${application.jwt.access.expiration-min}")
-    private int accessExpiration;
-
-    @Value("${application.jwt.refresh.expiration-days}")
-    private int refreshExpiration;
+    private int expiration;
 
     @Value("${application.jwt.secret}")
     private String secret;
 
     private final UserService userService;
 
-    public TokensDto generateTokens(UserEntity user) {
+    public String generateToken(UserEntity user) {
+        return generateAccessToken(user);
+    }
+
+    private String generateAccessToken(UserEntity user) {
         Date issuedAt = new Date();
         long millis = System.currentTimeMillis();
 
-        String accessToken = generateAccessToken(user, issuedAt, millis);
-        String refreshToken = generateRefreshToken(user, issuedAt, millis);
-
-        return new TokensDto(accessToken, refreshToken);
-    }
-
-    private String generateAccessToken(UserEntity user, Date issuedAt, long millis) {
         return Jwts.builder()
                 .setSubject(user.getId().toString())
                 .claim("roles", user.getRoles())
                 .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
-                .setExpiration(new Date(millis + 1000L * 60 * accessExpiration))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    private String generateRefreshToken(UserEntity user, Date issuedAt, long millis) {
-        return Jwts.builder()
-                .setSubject(user.getId().toString())
-                .setIssuedAt(issuedAt)
-                .setExpiration(new Date(millis + 1000L * 60 * 60 * 24 * refreshExpiration))
+                .setExpiration(new Date(millis + 1000L * 60 * expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
