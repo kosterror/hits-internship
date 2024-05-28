@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import ru.tsu.hits.hitsinternship.dto.group.GroupDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
+import ru.tsu.hits.hitsinternship.entity.UserStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,9 @@ public class UserDto {
 
     @Schema(description = "Статус пользователя (активирован ли он)", requiredMode = REQUIRED)
     private Boolean isActive;
+
+    @Schema(description = "Статус пользователя", requiredMode = REQUIRED)
+    private UserStatus status;
 
     @Schema(description = "Список ролей пользователя", requiredMode = REQUIRED)
     private List<Role> roles;
