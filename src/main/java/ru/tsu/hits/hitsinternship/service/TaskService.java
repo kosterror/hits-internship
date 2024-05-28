@@ -5,16 +5,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.task.NewTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.TaskDto;
-import ru.tsu.hits.hitsinternship.entity.FileMetaInfoEntity;
 import ru.tsu.hits.hitsinternship.entity.TaskEntity;
 import ru.tsu.hits.hitsinternship.entity.TaskEntity_;
-import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.TaskMapper;
 import ru.tsu.hits.hitsinternship.repository.TaskRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,8 +31,6 @@ public class TaskService {
 
         if (newTaskDto.getFiles() != null && !newTaskDto.getFiles().isEmpty()) {
             var files = fileStorageService.getFileMetaInfoEntities(newTaskDto.getFiles());
-            checkFiles(newTaskDto.getFiles(), files);
-
             entity.setFiles(files);
         }
 
@@ -50,26 +45,12 @@ public class TaskService {
         return taskMapper.toDto(entity);
     }
 
-
-    private void checkFiles(List<UUID> fileIds, List<FileMetaInfoEntity> files) {
-        if (files.size() != fileIds.size()) {
-            var foundFileIds = files.stream()
-                    .map(FileMetaInfoEntity::getId)
-                    .toList();
-
-            var notFoundFilesUds = new ArrayList<>(fileIds);
-            notFoundFilesUds.removeAll(foundFileIds);
-
-            throw new BadRequestException("Not found files with ids: %s".formatted(notFoundFilesUds));
-        }
-    }
-
     public TaskDto getTask(UUID id) {
         TaskEntity taskEntity = getTaskEntity(id);
         return taskMapper.toDto(taskEntity);
     }
 
-    private TaskEntity getTaskEntity(UUID id) {
+    public TaskEntity getTaskEntity(UUID id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id %s not found".formatted(id)));
     }

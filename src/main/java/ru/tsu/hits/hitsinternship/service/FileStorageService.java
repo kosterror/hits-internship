@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.tsu.hits.hitsinternship.config.MinioProperties;
 import ru.tsu.hits.hitsinternship.dto.filemetainfo.FileMetaInfoDto;
 import ru.tsu.hits.hitsinternship.entity.FileMetaInfoEntity;
+import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.InternalException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.FileMetaInfoMapper;
@@ -20,6 +21,7 @@ import ru.tsu.hits.hitsinternship.repository.FileMetaInfoRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,8 +88,20 @@ public class FileStorageService {
     }
 
     public List<FileMetaInfoEntity> getFileMetaInfoEntities(List<UUID> fileIds) {
-        return fileMetaInfoRepository.findAllById(fileIds);
+        var files = fileMetaInfoRepository.findAllById(fileIds);
 
+        if (files.size() != fileIds.size()) {
+            var foundFileIds = files.stream()
+                    .map(FileMetaInfoEntity::getId)
+                    .toList();
+
+            var notFoundFilesUds = new ArrayList<>(fileIds);
+            notFoundFilesUds.removeAll(foundFileIds);
+
+            throw new BadRequestException("Not found files with ids: %s".formatted(notFoundFilesUds));
+        }
+
+        return files;
     }
 
     private FileMetaInfoEntity getFileMetaInfoEntity(UUID fileId) {
