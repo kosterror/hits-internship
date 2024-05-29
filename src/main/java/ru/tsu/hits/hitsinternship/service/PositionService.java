@@ -44,17 +44,19 @@ public class PositionService {
 
     public void deletePosition(UUID positionId, UUID userId) {
         checkPermission(userId, positionId);
+
         if (!positionRepository.existsById(positionId)) {
             throw new NotFoundException("Position with id " + positionId + " not found");
         }
+
         positionRepository.deleteById(positionId);
     }
 
     public PositionDto createPosition(NewPositionDto newPositionDto, UUID userId) {
-
         checkPositionStatus(newPositionDto.getPositionStatus());
         checkOriginality(newPositionDto, userId);
         checkPriority(newPositionDto.getPriority(), userId);
+
         var company = companyWishesService.findCompanyById(newPositionDto.getCompanyId());
         var speciality = companyWishesService.findSpecialityById(newPositionDto.getSpecialityId());
         var user = userService.getUserEntityById(userId);
@@ -64,44 +66,48 @@ public class PositionService {
             var programLanguage = companyWishesService.findProgramLanguageById(newPositionDto.getProgramLanguageId());
             positionEntity.setProgramLanguage(programLanguage);
         }
+
         positionEntity.setCompany(company);
         positionEntity.setSpeciality(speciality);
         positionEntity.setUser(user);
         positionRepository.save(positionEntity);
+
         return positionMapper.entityToDto(positionEntity);
     }
 
     public List<PositionDto> getStudentPositions(UUID userId, UUID targetUserId) {
-
         checkPermissionWithRole(userId, targetUserId);
         var positions = positionRepository.findAllByUserId(userId);
+
         return positions.stream()
                 .map(positionMapper::entityToDto)
                 .toList();
     }
 
     public PositionDto updatePositionStatus(UUID positionId, PositionStatus positionStatus, UUID userId) {
-
         checkPermission(userId, positionId);
         checkPositionStatus(positionStatus);
+
         var position = findPositionById(positionId);
         position.setPositionStatus(positionStatus);
         positionRepository.save(position);
+
         return positionMapper.entityToDto(position);
     }
 
     public List<PositionDto> updatePositionPriority(List<UUID> positionIdList, UUID userId) {
-
         checkPosition(userId, positionIdList);
+
         for (UUID uuid : positionIdList) {
             checkPermission(userId, uuid);
         }
-        for (int i = 0; i < positionIdList.size(); i++) {
 
+        for (int i = 0; i < positionIdList.size(); i++) {
             var position = findPositionById(positionIdList.get(i));
             position.setPriority(i);
             positionRepository.save(position);
         }
+
         return positionRepository.findAllByUserId(userId)
                 .stream()
                 .map(positionMapper::entityToDto)
@@ -112,11 +118,13 @@ public class PositionService {
         var position = findPositionById(positionId);
         position.setPositionStatus(PositionStatus.CONFIRMED_RECEIVED_OFFER);
         positionRepository.save(position);
+
         return positionMapper.entityToDto(position);
     }
 
     public void checkPermissionWithRole(UUID userId, UUID targetUserId) {
         var user = userService.getUserEntityById(userId);
+
         if (user.getRoles().contains(Role.STUDENT) && !targetUserId.equals(userId)) {
             throw new ForbiddenException("You don't have permission to do this");
         }
@@ -124,6 +132,7 @@ public class PositionService {
 
     private void checkPermission(UUID userId, UUID positionId) {
         var position = findPositionById(positionId);
+
         if (!position.getUser().getId().equals(userId)) {
             throw new ForbiddenException("You don't have permission to do this");
         }
@@ -136,8 +145,8 @@ public class PositionService {
     }
 
     private void checkOriginality(NewPositionDto newPositionDto, UUID userId) {
-
         var positions = positionRepository.findAllByUserId(userId);
+
         for (var position : positions) {
             if (position.getCompany().getId().equals(newPositionDto.getCompanyId()) &&
                     position.getSpeciality().getId().equals(newPositionDto.getSpecialityId()) &&
@@ -155,10 +164,11 @@ public class PositionService {
     }
 
     private boolean checkProgramLanguage(ProgramLanguageEntity programLanguage, UUID programLanguageId) {
-
         if (programLanguage != null) {
             return programLanguage.getId().equals(programLanguageId);
-        } else return programLanguageId != null;
+        }
+
+        return programLanguageId != null;
     }
 
     private void checkPriority(Integer priority, UUID userId) {
