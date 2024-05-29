@@ -102,4 +102,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
+
+    public List<UserEntity> getUsersByGroupIds(List<UUID> groupIds) {
+        Specification<UserEntity> spec = UserSpecification.inGroupIds(groupIds);
+        return userRepository.findAll(spec);
+    }
 }

@@ -8,17 +8,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
+import ru.tsu.hits.hitsinternship.dto.position.FinalPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
-import ru.tsu.hits.hitsinternship.entity.PositionEntity;
-import ru.tsu.hits.hitsinternship.entity.PositionStatus;
-import ru.tsu.hits.hitsinternship.entity.ProgramLanguageEntity;
-import ru.tsu.hits.hitsinternship.entity.Role;
+import ru.tsu.hits.hitsinternship.entity.*;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
+import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
 import ru.tsu.hits.hitsinternship.specification.PositionSpecification;
 
@@ -34,6 +34,8 @@ public class PositionService {
     private final PositionRepository positionRepository;
 
     private final PositionMapper positionMapper;
+
+    private final UserMapper userMapper;
 
     private final CompanyWishesService companyWishesService;
 
@@ -220,5 +222,23 @@ public class PositionService {
                 .pageSize(positions.getSize())
                 .elements(positionDtos)
                 .build();
+    }
+
+    @Transactional
+    public List<FinalPositionDto> getFinalPositions(List<UUID> groupIds) {
+        List<UserEntity> users = userService.getUsersByGroupIds(groupIds);
+
+        return users.stream()
+                .map(user -> {
+                    List<PositionEntity> positions = positionRepository.findAllByUserId(user.getId());
+                    return FinalPositionDto.builder()
+                            .student(userMapper.entityToDto(user))
+                            .positions(positions.stream()
+                                    .filter(p -> p.getPositionStatus() == PositionStatus.ACCEPTED_OFFER)
+                                    .map(positionMapper::entityToDto)
+                                    .toList())
+                            .build();
+                })
+                .toList();
     }
 }
