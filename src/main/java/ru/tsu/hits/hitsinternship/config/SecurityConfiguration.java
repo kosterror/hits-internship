@@ -51,7 +51,7 @@ public class SecurityConfiguration {
                                         antMatcher(GET, "/api/v1/specialties"),
                                         antMatcher(GET, "/api/v1/companies"),
                                         antMatcher(GET, "/api/v1/program-languages"),
-                                        new NegatedRequestMatcher(antMatcher("/api/*"))
+                                        new NegatedRequestMatcher(antMatcher("/api/**"))
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
