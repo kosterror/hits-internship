@@ -3,7 +3,12 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
 import ru.tsu.hits.hitsinternship.entity.PositionEntity;
@@ -15,6 +20,7 @@ import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
+import ru.tsu.hits.hitsinternship.specification.PositionSpecification;
 
 import java.util.List;
 import java.util.Objects;
@@ -109,10 +115,8 @@ public class PositionService {
 
     public void checkPermissionWithRole(UUID userId, UUID targetUserId) {
         var user = userService.getUserEntityById(userId);
-        if (user.getRoles().contains(Role.STUDENT)) {
-            if (!targetUserId.equals(userId)) {
-                throw new ForbiddenException("You don't have permission to do this");
-            }
+        if (user.getRoles().contains(Role.STUDENT) && !targetUserId.equals(userId)) {
+            throw new ForbiddenException("You don't have permission to do this");
         }
     }
 
@@ -168,5 +172,53 @@ public class PositionService {
         if (!Objects.equals(positionRepository.findAllByUserId(userId).size(), positionIdList.size())) {
             throw new BadRequestException("Position list is not correct");
         }
+    }
+
+    public PaginationResponse<PositionDto> getPositions(List<UUID> companyIds,
+                                                        List<UUID> specialityIds,
+                                                        List<UUID> programLanguageIds,
+                                                        List<UUID> studentIds,
+                                                        List<UUID> groupIds,
+                                                        PositionStatus positionStatus,
+                                                        int page,
+                                                        int size) {
+        Specification<PositionEntity> spec = Specification.where(null);
+
+        if (companyIds != null && !companyIds.isEmpty()) {
+            spec = spec.and(PositionSpecification.hasCompanyIds(companyIds));
+        }
+
+        if (specialityIds != null && !specialityIds.isEmpty()) {
+            spec = spec.and(PositionSpecification.hasSpecialityIds(specialityIds));
+        }
+
+        if (programLanguageIds != null && !programLanguageIds.isEmpty()) {
+            spec = spec.and(PositionSpecification.hasProgramLanguageIds(programLanguageIds));
+        }
+
+        if (studentIds != null && !studentIds.isEmpty()) {
+            spec = spec.and(PositionSpecification.hasStudentIds(studentIds));
+        }
+
+        if (groupIds != null && !groupIds.isEmpty()) {
+            spec = spec.and(PositionSpecification.hasGroupIds(groupIds));
+        }
+
+        if (positionStatus != null) {
+            spec = spec.and(PositionSpecification.hasPositionStatus(positionStatus));
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PositionEntity> positions = positionRepository.findAll(spec, pageable);
+
+        List<PositionDto> positionDtos = positions.stream()
+                .map(positionMapper::entityToDto)
+                .toList();
+
+        return PaginationResponse.<PositionDto>builder()
+                .pageNumber(positions.getNumber())
+                .pageSize(positions.getSize())
+                .elements(positionDtos)
+                .build();
     }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
 import ru.tsu.hits.hitsinternship.entity.PositionStatus;
@@ -31,7 +32,6 @@ public class PositionController {
     @PostMapping
     @PreAuthorize("hasRole('STUDENT')")
     public PositionDto createPosition(@Valid @RequestBody NewPositionDto newPositionDto) {
-
         return positionService.createPosition(newPositionDto, SecurityUtil.extractId());
     }
 
@@ -71,6 +71,27 @@ public class PositionController {
     @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
     public PositionDto confirmReceivedOffer(@PathVariable UUID positionId) {
         return positionService.confirmReceivedOffer(positionId);
+    }
+
+    @Operation(summary = "Получить позиции", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    public PaginationResponse<PositionDto> getPositions(@RequestParam(required = false) List<UUID> companyIds,
+                                                        @RequestParam(required = false) List<UUID> specialityIds,
+                                                        @RequestParam(required = false) List<UUID> programLanguageIds,
+                                                        @RequestParam(required = false) List<UUID> studentIds,
+                                                        @RequestParam(required = false) List<UUID> groupIds,
+                                                        @RequestParam(required = false) PositionStatus positionStatus,
+                                                        @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size) {
+        return positionService.getPositions(companyIds,
+                specialityIds,
+                programLanguageIds,
+                studentIds,
+                groupIds,
+                positionStatus,
+                page,
+                size);
     }
 
 }
