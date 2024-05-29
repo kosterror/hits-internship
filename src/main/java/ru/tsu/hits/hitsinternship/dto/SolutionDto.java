@@ -31,8 +31,8 @@ public class SolutionDto {
     @Schema(description = "Автор решения", requiredMode = REQUIRED)
     private UserDto author;
 
-    @Schema(description = "Дата и время загрузки решения", requiredMode = REQUIRED)
-    private LocalDateTime dateTime;
+    @Schema(description = "Дата и время загрузки последнего изменения решения студентом", requiredMode = REQUIRED)
+    private LocalDateTime lastUpdateDateTime;
 
     @Schema(description = "Список файлов", requiredMode = NOT_REQUIRED)
     private List<FileMetaInfoDto> files;
