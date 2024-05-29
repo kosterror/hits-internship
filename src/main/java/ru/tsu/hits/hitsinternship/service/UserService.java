@@ -10,10 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
-import ru.tsu.hits.hitsinternship.entity.GroupEntity_;
-import ru.tsu.hits.hitsinternship.entity.Role;
-import ru.tsu.hits.hitsinternship.entity.UserEntity;
-import ru.tsu.hits.hitsinternship.entity.UserEntity_;
+import ru.tsu.hits.hitsinternship.entity.*;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.UserRepository;
@@ -106,5 +103,11 @@ public class UserService {
     public List<UserEntity> getUsersByGroupIds(List<UUID> groupIds) {
         Specification<UserEntity> spec = UserSpecification.inGroupIds(groupIds);
         return userRepository.findAll(spec);
+    }
+
+    public void updateUserStatus(UUID userId, UserStatus userStatus) {
+        var user = getUserEntityById(userId);
+        user.setStatus(userStatus);
+        userRepository.save(user);
     }
 }

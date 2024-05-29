@@ -84,12 +84,24 @@ public class PositionService {
                 .toList();
     }
 
-    public PositionDto updatePositionStatus(UUID positionId, PositionStatus positionStatus, UUID userId) {
+    public PositionDto updatePositionStatus(UUID positionId,
+                                            PositionStatus positionStatus,
+                                            UUID userId) {
         checkPermission(userId, positionId);
         checkPositionStatus(positionStatus);
 
         var position = findPositionById(positionId);
         position.setPositionStatus(positionStatus);
+
+        if (positionStatus == PositionStatus.ACCEPTED_OFFER) {
+            userService.updateUserStatus(userId, UserStatus.GOT_INTERNSHIP);
+        }
+
+        if (position.getPositionStatus() == PositionStatus.ACCEPTED_OFFER
+                && position.getPositionStatus() != positionStatus) {
+            userService.updateUserStatus(userId, UserStatus.IN_SEARCHING);
+        }
+
         positionRepository.save(position);
 
         return positionMapper.entityToDto(position);
