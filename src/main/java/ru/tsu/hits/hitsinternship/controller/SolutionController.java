@@ -2,6 +2,7 @@ package ru.tsu.hits.hitsinternship.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import static ru.tsu.hits.hitsinternship.util.SecurityUtil.extractId;
 
+@Tag(name = "Ответы на задания")
 @RequestMapping("/api/v1/tasks/{taskId}/solutions")
 @RestController
 @RequiredArgsConstructor
