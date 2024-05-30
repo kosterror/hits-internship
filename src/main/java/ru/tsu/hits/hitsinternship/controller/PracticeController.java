@@ -35,7 +35,7 @@ public class PracticeController {
     @Operation(summary = "Получить места практики для каждого из группы студентов в рамках семестра",
             security = @SecurityRequirement(name = "BearerAuth"))
     @PreAuthorize("hasRole('DEAN_OFFICER')")
-    @GetMapping("/api/v1/practices/reports")
+    @GetMapping("/practices/reports")
     public PracticeReportDto getPractices(@RequestParam UUID semesterId,
                                           @RequestParam List<UUID> groupIds
     ) {
