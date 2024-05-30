@@ -11,7 +11,6 @@ import java.util.UUID;
 @Data
 public class PracticeDto {
 
-
     private UUID id;
 
     private String comment;

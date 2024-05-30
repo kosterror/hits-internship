@@ -102,7 +102,7 @@ public class UserService {
 
     public List<UserEntity> getUsersByGroupIds(List<UUID> groupIds) {
         Specification<UserEntity> spec = UserSpecification.inGroupIds(groupIds);
-        return userRepository.findAll(spec);
+        return userRepository.findAll(spec, Sort.by(UserEntity_.GROUP + "." + GroupEntity_.NAME, UserEntity_.FULL_NAME));
     }
 
     public void updateUserStatus(UUID userId, UserStatus userStatus) {

@@ -20,7 +20,7 @@ public class PracticeEntity {
 
     private String comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "semester_id")
     private SemesterEntity semester;
 

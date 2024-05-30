@@ -8,10 +8,14 @@ import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.PracticeDto;
+import ru.tsu.hits.hitsinternship.dto.practice.PracticeReportDto;
 import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
+import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
+import ru.tsu.hits.hitsinternship.exception.InternalException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PracticeMapper;
+import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PracticeRepository;
 
 import java.util.List;
@@ -25,6 +29,8 @@ public class PracticeService {
     private final PracticeRepository practiceRepository;
 
     private final PracticeMapper practiceMapper;
+
+    private final UserMapper userMapper;
 
     private final PositionService positionService;
 
@@ -79,5 +85,36 @@ public class PracticeService {
                 ).stream()
                 .map(practiceMapper::entityToDto)
                 .toList();
+    }
+
+    public PracticeReportDto getPractices(UUID semesterId, List<UUID> groupIds) {
+        List<UserEntity> studentsFromGroups = userService.getUsersByGroupIds(groupIds);
+
+        var studentsWithPractice = studentsFromGroups.stream()
+                .filter(student ->
+                        student.getPractices()
+                                .stream()
+                                .anyMatch(practice -> semesterId.equals(practice.getSemester().getId()))
+                ).toList();
+
+        studentsFromGroups.removeAll(studentsWithPractice);
+        var studentsWithoutPractice = studentsFromGroups.stream()
+                .map(userMapper::entityToDto)
+                .toList();
+
+        var practices = studentsWithPractice.stream()
+                .map(student -> {
+                            var practice =
+                                    student.getPractices()
+                                            .stream()
+                                            .filter(p -> semesterId.equals(p.getSemester().getId()))
+                                            .findAny()
+                                            .orElseThrow(() -> new InternalException("Failed to find needed practice in already filtered practices"));
+
+                            return practiceMapper.entityToDto(practice);
+                        }
+                ).toList();
+
+        return new PracticeReportDto(practices, studentsWithoutPractice);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
 import ru.tsu.hits.hitsinternship.dto.practice.PracticeDto;
+import ru.tsu.hits.hitsinternship.dto.practice.PracticeReportDto;
 import ru.tsu.hits.hitsinternship.service.PracticeService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
@@ -28,8 +29,17 @@ public class PracticeController {
     @PostMapping("/practices")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
     public PracticeDto createPractice(@Valid @RequestBody NewPracticeDto newPracticeDto) {
-
         return practiceService.createPractice(newPracticeDto);
+    }
+
+    @Operation(summary = "Получить места практики для каждого из группы студентов в рамках семестра",
+            security = @SecurityRequirement(name = "BearerAuth"))
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @GetMapping("/api/v1/practices/reports")
+    public PracticeReportDto getPractices(@RequestParam UUID semesterId,
+                                          @RequestParam List<UUID> groupIds
+    ) {
+        return practiceService.getPractices(semesterId, groupIds);
     }
 
     @Operation(summary = "Изменить место практики", security = @SecurityRequirement(name = "BearerAuth"))

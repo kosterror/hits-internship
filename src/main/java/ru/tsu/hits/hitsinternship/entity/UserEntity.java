@@ -46,7 +46,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "owner")
     private List<FileMetaInfoEntity> files;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<PracticeEntity> practices;
 
     @OneToMany(mappedBy = "author")
