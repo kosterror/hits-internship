@@ -4,11 +4,10 @@ package ru.tsu.hits.hitsinternship.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.PracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.PracticeReportDto;
+import org.springframework.transaction.annotation.Transactional;
+import ru.tsu.hits.hitsinternship.dto.practice.*;
 import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
@@ -17,6 +16,9 @@ import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PracticeMapper;
 import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PracticeRepository;
+import ru.tsu.hits.hitsinternship.repository.UserRepository;
+import ru.tsu.hits.hitsinternship.specification.PracticeSpecification;
+import ru.tsu.hits.hitsinternship.specification.UserSpecification;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +41,7 @@ public class PracticeService {
     private final SemesterService semesterService;
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
 
     public List<PracticeDto> getStudentPractices(UUID userId, UUID targetUserId) {
@@ -116,5 +119,80 @@ public class PracticeService {
                 ).toList();
 
         return new PracticeReportDto(practices, studentsWithoutPractice);
+    }
+
+    @Transactional
+    public PracticeMigrationResult migratePractices(UUID fromSemesterId, UUID toSemesterId, List<UUID> groupIds) {
+        var alreadyExistedPractices = getPracticesFromSemesterForGroupIds(toSemesterId, groupIds);
+        var usersWithoutPractices = getUsersFromGroupsAndWithoutPracticesInSemester(fromSemesterId, groupIds);
+        var migratedPractices = migratePractices(fromSemesterId, toSemesterId, groupIds, alreadyExistedPractices);
+
+        return new PracticeMigrationResult(
+                migratedPractices.stream()
+                        .map(practiceMapper::entityToDto)
+                        .toList(),
+                alreadyExistedPractices.stream()
+                        .map(practiceMapper::entityToDto)
+                        .toList(),
+                usersWithoutPractices.stream()
+                        .map(userMapper::entityToDto)
+                        .toList()
+        );
+    }
+
+    private List<PracticeEntity> migratePractices(UUID fromSemesterId,
+                                                  UUID toSemesterId,
+                                                  List<UUID> groupIds,
+                                                  List<PracticeEntity> alreadyExistedPractices
+    ) {
+        var practicesToMigrate = getPracticesFromSemesterForGroupIdsExcludePracticesForStudentsInList(
+                fromSemesterId,
+                groupIds,
+                alreadyExistedPractices.stream()
+                        .map(practice -> practice.getUser()
+                                .getId())
+                        .toList()
+        );
+
+        var newSemester = semesterService.getSemesterEntity(toSemesterId);
+
+        var newPractices = practicesToMigrate.stream().map(practice ->
+                PracticeEntity.builder()
+                        .comment(practice.getComment())
+                        .semester(newSemester)
+                        .user(practice.getUser())
+                        .company(practice.getCompany())
+                        .build()
+        ).toList();
+
+        return practiceRepository.saveAll(newPractices);
+    }
+
+    private List<PracticeEntity> getPracticesFromSemesterForGroupIds(UUID semesterId, List<UUID> groupIds) {
+        Specification<PracticeEntity> spec = Specification
+                .where(PracticeSpecification.hasSemester(semesterId))
+                .and(PracticeSpecification.userInGroupIds(groupIds));
+
+        return practiceRepository.findAll(spec);
+    }
+
+    private List<PracticeEntity> getPracticesFromSemesterForGroupIdsExcludePracticesForStudentsInList(
+            UUID semesterId,
+            List<UUID> groupIds,
+            List<UUID> studentIdsToExclude
+    ) {
+        Specification<PracticeEntity> spec = Specification
+                .where(PracticeSpecification.hasSemester(semesterId))
+                .and(PracticeSpecification.userInGroupIds(groupIds))
+                .and(PracticeSpecification.userNotIn(studentIdsToExclude));
+
+        return practiceRepository.findAll(spec);
+    }
+
+    private List<UserEntity> getUsersFromGroupsAndWithoutPracticesInSemester(UUID semesterId, List<UUID> groupIds) {
+        Specification<UserEntity> specification =
+                UserSpecification.hasNoPracticeInSemesterAndInGroupIds(semesterId, groupIds);
+
+        return userRepository.findAll(specification);
     }
 }

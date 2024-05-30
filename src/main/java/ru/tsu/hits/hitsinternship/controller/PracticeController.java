@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.tsu.hits.hitsinternship.dto.practice.EditPracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.NewPracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.PracticeDto;
-import ru.tsu.hits.hitsinternship.dto.practice.PracticeReportDto;
+import ru.tsu.hits.hitsinternship.dto.practice.*;
 import ru.tsu.hits.hitsinternship.service.PracticeService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
@@ -42,10 +39,22 @@ public class PracticeController {
         return practiceService.getPractices(semesterId, groupIds);
     }
 
+    @Operation(summary = "Перенести места практики из одного семестра в другой",
+            security = @SecurityRequirement(name = "BearerAuth")
+    )
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PostMapping("/practices/migrate")
+    public PracticeMigrationResult migratePractices(@RequestParam UUID fromSemesterId,
+                                                    @RequestParam UUID toSemesterId,
+                                                    @RequestParam List<UUID> groupIds) {
+        return practiceService.migratePractices(fromSemesterId, toSemesterId, groupIds);
+    }
+
     @Operation(summary = "Изменить место практики", security = @SecurityRequirement(name = "BearerAuth"))
     @PutMapping("/practices/{practiceId}")
     @PreAuthorize("hasRole('DEAN_OFFICER')")
-    public PracticeDto updatePractice(@Valid @PathVariable UUID practiceId, @RequestBody EditPracticeDto editPracticeDto) {
+    public PracticeDto updatePractice(@Valid @PathVariable UUID practiceId,
+                                      @RequestBody EditPracticeDto editPracticeDto) {
         return practiceService.updatePractice(practiceId, editPracticeDto);
     }
 
@@ -56,7 +65,9 @@ public class PracticeController {
         return practiceService.getStudentPractices(SecurityUtil.extractId(), userId);
     }
 
-    @Operation(summary = "Получить места практики для семестра", security = @SecurityRequirement(name = "BearerAuth"))
+    @Operation(summary = "Получить места практики для семестра",
+            security = @SecurityRequirement(name = "BearerAuth")
+    )
     @GetMapping("/semesters/{semesterId}/practices")
     @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
     public List<PracticeDto> getSemesterPractices(@PathVariable UUID semesterId) {
