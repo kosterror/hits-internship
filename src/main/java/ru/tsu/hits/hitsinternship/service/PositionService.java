@@ -88,16 +88,15 @@ public class PositionService {
                                             PositionStatus positionStatus,
                                             UUID userId) {
         checkPermission(userId, positionId);
-        checkPositionStatus(positionStatus);
-
         var position = findPositionById(positionId);
+        checkPositionStatus(positionStatus, position);
         position.setPositionStatus(positionStatus);
 
         if (positionStatus == PositionStatus.ACCEPTED_OFFER) {
             userService.updateUserStatus(userId, UserStatus.GOT_INTERNSHIP);
         }
 
-        if (position.getPositionStatus() == PositionStatus.ACCEPTED_OFFER
+        if (position.getPositionStatus() != PositionStatus.ACCEPTED_OFFER
                 && position.getPositionStatus() != positionStatus) {
             userService.updateUserStatus(userId, UserStatus.IN_SEARCHING);
         }
@@ -169,10 +168,26 @@ public class PositionService {
         }
     }
 
-    private void checkPositionStatus(PositionStatus positionStatus) {
+    public void checkPositionStatus(PositionStatus positionStatus, PositionEntity position) {
+        var status = position.getPositionStatus();
         if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER) {
             throw new BadRequestException("You can't set this position status");
         }
+        if (positionStatus == PositionStatus.ACCEPTED_OFFER || positionStatus == PositionStatus.REJECTED_OFFER) {
+            if (status != PositionStatus.CONFIRMED_RECEIVED_OFFER && status != PositionStatus.ACCEPTED_OFFER && status != PositionStatus.REJECTED_OFFER) {
+                throw new BadRequestException("You can't set this position status," +
+                        "until the coordinator confirms that the offer has been sent");
+            }
+        }
+
+    }
+
+    private void checkPositionStatus(PositionStatus positionStatus) {
+        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER ||
+                positionStatus == PositionStatus.ACCEPTED_OFFER || positionStatus == PositionStatus.REJECTED_OFFER) {
+            throw new BadRequestException("You can't set this position status");
+        }
+
     }
 
     private boolean checkProgramLanguage(ProgramLanguageEntity programLanguage, UUID programLanguageId) {
