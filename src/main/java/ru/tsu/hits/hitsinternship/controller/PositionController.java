@@ -63,7 +63,7 @@ public class PositionController {
     @GetMapping("/{userId}")
     @PreAuthorize("hasAnyRole('STUDENT', 'DEAN_OFFICER', 'CURATOR')")
     public List<PositionDto> getStudentPositions(@PathVariable UUID userId) {
-        return positionService.getStudentPositions(userId, SecurityUtil.extractId());
+        return positionService.getStudentPositions(SecurityUtil.extractId(), userId);
     }
 
 
