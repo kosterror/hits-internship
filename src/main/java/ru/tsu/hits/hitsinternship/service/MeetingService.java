@@ -80,7 +80,8 @@ public class MeetingService {
                 getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.THIRD),
                 getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.FOURTH),
                 getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.FIFTH),
-                getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.SIXTH)
+                getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.SIXTH),
+                getMeetingsGroupedByNumber(groupIds, from, to, PairNumber.SEVENTH)
         );
     }
 
