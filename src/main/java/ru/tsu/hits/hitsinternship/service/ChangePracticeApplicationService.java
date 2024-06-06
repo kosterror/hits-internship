@@ -16,7 +16,7 @@ import ru.tsu.hits.hitsinternship.mapper.ChangePracticeApplicationMapper;
 import ru.tsu.hits.hitsinternship.repository.ChangePracticeApplicationRepository;
 
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -116,7 +116,7 @@ public class ChangePracticeApplicationService {
 
     private void checkDeadline(SemesterEntity semester) {
 
-        if (semester.getStartDate().isAfter(ChronoLocalDate.from(LocalDateTime.now()))) {
+        if (semester.getChangeCompanyApplicationDeadline().isAfter(ChronoLocalDateTime.from(LocalDateTime.now()))) {
             throw new BadRequestException("Срок подачи заявок на изменение места практики истек");
         }
     }
