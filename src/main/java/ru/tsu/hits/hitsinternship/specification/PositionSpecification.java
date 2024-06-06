@@ -35,7 +35,7 @@ public class PositionSpecification {
         return (root, query, builder) ->
                 builder.like(
                         root.get(PositionEntity_.USER)
-                                .get(UserEntity_.ID),
+                                .get(UserEntity_.FULL_NAME),
                         "%" + fullName + "%"
                 );
     }
