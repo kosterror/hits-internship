@@ -216,7 +216,7 @@ public class PositionService {
     public PaginationResponse<PositionDto> getPositions(List<UUID> companyIds,
                                                         List<UUID> specialityIds,
                                                         List<UUID> programLanguageIds,
-                                                        List<UUID> studentIds,
+                                                        String fullName,
                                                         List<UUID> groupIds,
                                                         PositionStatus positionStatus,
                                                         int page,
@@ -235,8 +235,8 @@ public class PositionService {
             spec = spec.and(PositionSpecification.hasProgramLanguageIds(programLanguageIds));
         }
 
-        if (studentIds != null && !studentIds.isEmpty()) {
-            spec = spec.and(PositionSpecification.hasStudentIds(studentIds));
+        if (fullName != null && !fullName.isEmpty()) {
+            spec = spec.and(PositionSpecification.fullNameLike(fullName));
         }
 
         if (groupIds != null && !groupIds.isEmpty()) {

@@ -31,10 +31,13 @@ public class PositionSpecification {
                         .in(programLanguageIds);
     }
 
-    public static Specification<PositionEntity> hasStudentIds(List<UUID> studentIds) {
-        return (root, query, builder) -> root.get(PositionEntity_.USER)
-                .get(UserEntity_.ID)
-                .in(studentIds);
+    public static Specification<PositionEntity> fullNameLike(String fullName) {
+        return (root, query, builder) ->
+                builder.like(
+                        root.get(PositionEntity_.USER)
+                                .get(UserEntity_.ID),
+                        "%" + fullName + "%"
+                );
     }
 
     public static Specification<PositionEntity> hasGroupIds(List<UUID> groupIds) {
