@@ -27,14 +27,14 @@ public class CompanyWishesController {
 
     @Operation(summary = "Создать запись о пожелании компании", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
-    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR')")
     public CompanyWishDto createGroup(@Valid @RequestBody NewCompanyWishDto newCompanyWishDto) {
         return companyWishesService.createCompanyWish(newCompanyWishDto);
     }
 
     @Operation(summary = "Изменить пожелание компании", security = @SecurityRequirement(name = "BearerAuth"))
     @PutMapping("/{companyWishId}")
-    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR')")
     public CompanyWishDto updateGroup(@Valid @PathVariable UUID companyWishId, @RequestBody NewCompanyWishDto newCompanyWishDto) {
         return companyWishesService.updateCompanyWish(companyWishId, newCompanyWishDto);
     }
@@ -42,7 +42,7 @@ public class CompanyWishesController {
     @ResponseStatus(NO_CONTENT)
     @Operation(summary = "Удалить пожелание компании", security = @SecurityRequirement(name = "BearerAuth"))
     @DeleteMapping("/{companyWishId}")
-    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR')")
     public ResponseEntity<Void> deleteCompanyWish(@PathVariable UUID companyWishId) {
         companyWishesService.deleteCompanyWish(companyWishId);
         return ResponseEntity.noContent().build();
@@ -50,7 +50,7 @@ public class CompanyWishesController {
 
     @Operation(summary = "Получить пожелания компании", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/{companyId}")
-    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR')")
     public List<CompanyWishDto> getCompanyWish(@PathVariable UUID companyId) {
         return companyWishesService.getCompanyWishes(companyId);
     }

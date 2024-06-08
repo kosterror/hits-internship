@@ -61,7 +61,7 @@ public class PositionController {
 
     @Operation(summary = "Получить позиции студента", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'DEAN_OFFICER', 'CURATOR')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public List<PositionDto> getStudentPositions(@PathVariable UUID userId) {
         return positionService.getStudentPositions(SecurityUtil.extractId(), userId);
     }
@@ -69,14 +69,14 @@ public class PositionController {
 
     @Operation(summary = "Подтвердить получение оффера", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/{positionId}/confirm-received-offer")
-    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public PositionDto confirmReceivedOffer(@PathVariable UUID positionId) {
         return positionService.confirmReceivedOffer(positionId);
     }
 
     @Operation(summary = "Получить позиции", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
-    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public PaginationResponse<PositionDto> getPositions(@RequestParam(required = false) List<UUID> companyIds,
                                                         @RequestParam(required = false) List<UUID> specialityIds,
                                                         @RequestParam(required = false) List<UUID> programLanguageIds,
@@ -97,7 +97,7 @@ public class PositionController {
 
     @Operation(summary = "Получить позиции в конечном статусе", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/final")
-    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public List<FinalPositionDto> getFinalPositions(@RequestParam List<UUID> groupIds) {
         return positionService.getFinalPositions(groupIds);
     }
