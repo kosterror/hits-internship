@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.task.NewTaskDto;
@@ -37,11 +38,18 @@ public class TaskController {
         return taskService.getTask(id);
     }
 
+    @PreAuthorize("hasRole('DEAN_OFFICER')")
+    @Operation(summary = "Удалить задачу", security = @SecurityRequirement(name = "BearerAuth"))
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "Получить все задачи для семестра", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public List<TaskDto> getTasks(@RequestParam UUID semesterId) {
         return taskService.getTasks(semesterId);
     }
-
 
 }

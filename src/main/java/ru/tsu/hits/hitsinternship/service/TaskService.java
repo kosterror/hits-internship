@@ -63,4 +63,9 @@ public class TaskService {
                 .map(taskMapper::toDto)
                 .toList();
     }
+
+    public void deleteTask(UUID id) {
+        var task = getTaskEntity(id);
+        taskRepository.delete(task);
+    }
 }
