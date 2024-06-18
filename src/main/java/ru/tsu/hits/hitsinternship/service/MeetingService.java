@@ -16,7 +16,9 @@ import ru.tsu.hits.hitsinternship.repository.MeetingRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,11 +102,11 @@ public class MeetingService {
         );
     }
 
-    private List<MeetingDto> getMeetings(List<UUID> groupIds,
-                                         LocalDate from,
-                                         LocalDate to,
-                                         PairNumber pairNumber,
-                                         DayOfWeek dayOfWeek) {
+    private Set<MeetingDto> getMeetings(List<UUID> groupIds,
+                                        LocalDate from,
+                                        LocalDate to,
+                                        PairNumber pairNumber,
+                                        DayOfWeek dayOfWeek) {
         Specification<MeetingEntity> spec = (root, query, cb) -> {
             Predicate inGroups = root.get("groups").get("id").in(groupIds);
             Predicate betweenDates = cb.between(root.get("date"), from, to);
@@ -117,6 +119,6 @@ public class MeetingService {
 
         return meetings.stream()
                 .map(meetingMapper::toDto)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

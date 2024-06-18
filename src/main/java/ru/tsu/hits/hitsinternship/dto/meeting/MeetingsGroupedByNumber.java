@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.tsu.hits.hitsinternship.entity.PairNumber;
 
-import java.util.List;
+import java.util.Set;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
@@ -17,21 +17,21 @@ public class MeetingsGroupedByNumber {
     private PairNumber pairNumber;
 
     @Schema(description = "Список встреч на понедельник", requiredMode = REQUIRED)
-    private List<MeetingDto> mondayMeetings;
+    private Set<MeetingDto> mondayMeetings;
 
     @Schema(description = "Список встреч на вторник", requiredMode = REQUIRED)
-    private List<MeetingDto> tuesdayMeetings;
+    private Set<MeetingDto> tuesdayMeetings;
 
     @Schema(description = "Список встреч на среду", requiredMode = REQUIRED)
-    private List<MeetingDto> wednesdayMeetings;
+    private Set<MeetingDto> wednesdayMeetings;
 
     @Schema(description = "Список встреч на четверг", requiredMode = REQUIRED)
-    private List<MeetingDto> thursdayMeetings;
+    private Set<MeetingDto> thursdayMeetings;
 
     @Schema(description = "Список встреч на пятницу", requiredMode = REQUIRED)
-    private List<MeetingDto> fridayMeetings;
+    private Set<MeetingDto> fridayMeetings;
 
     @Schema(description = "Список встреч на субботу", requiredMode = REQUIRED)
-    private List<MeetingDto> saturdayMeetings;
+    private Set<MeetingDto> saturdayMeetings;
 
 }

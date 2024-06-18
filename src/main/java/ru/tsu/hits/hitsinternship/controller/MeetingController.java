@@ -48,7 +48,7 @@ public class MeetingController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Получить встречи")
+    @Operation(summary = "Получить встречи", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public List<MeetingsGroupedByNumber> getMeetings(@RequestParam List<UUID> groupIds,
                                                      @RequestParam LocalDate from,
