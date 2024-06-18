@@ -1,17 +1,13 @@
 package ru.tsu.hits.hitsinternship.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter
+@Setter
 @Entity
 @Table(name = "company_wishes")
 public class CompanyWishesEntity {
