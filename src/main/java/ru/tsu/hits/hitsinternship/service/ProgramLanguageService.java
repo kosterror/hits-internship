@@ -37,7 +37,7 @@ public class ProgramLanguageService {
         if (!isEmpty(programLanguage.getCompanyWishes()) || !isEmpty(programLanguage.getPositions())) {
             throw new ConflictException(
                     "Язык программирования '%s' используется в пожеланиях компании или позициях"
-                            .formatted(programLanguageId)
+                            .formatted(programLanguage.getName())
             );
         }
 
