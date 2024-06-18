@@ -62,7 +62,7 @@ public class SolutionService {
 
     private void checkTaskDeadline(TaskEntity task) {
         if (task.getDeadline().isBefore(LocalDateTime.now())) {
-            throw new ConflictException("The deadline has passed");
+            throw new ConflictException("Дедлайн прошел");
         }
     }
 
@@ -113,7 +113,7 @@ public class SolutionService {
         checkTaskDeadline(solution.getTask());
 
         if (solution.getState() == SolutionState.ACCEPTED) {
-            throw new ConflictException("From ACCEPTED state solution can't be changed");
+            throw new ConflictException("Нельзя изменить решение после его принятия");
         }
 
         if (newSolutionDto.getFileIds() != null) {

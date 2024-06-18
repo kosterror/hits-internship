@@ -33,7 +33,7 @@ public class AuthService {
     @Transactional
     public void register(NewUserDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ConflictException("User with this email already exists");
+            throw new ConflictException("Почта занята");
         }
 
         var user = UserEntity.builder()
@@ -75,7 +75,7 @@ public class AuthService {
 
         for (NewStudentDto dto : newStudentDtos) {
             if (userRepository.existsByEmail(dto.getEmail())) {
-                throw new ConflictException("User with email %s already exists".formatted(dto.getEmail()));
+                throw new ConflictException("Почта %s занята".formatted(dto.getEmail()));
             }
 
             var user = UserEntity.builder()
@@ -105,7 +105,7 @@ public class AuthService {
                 );
 
         if (!user.isActive()) {
-            throw new ConflictException(String.format("User with email %s is not activated", loginDto.getEmail()));
+            throw new ConflictException(String.format("Пользователь с почтой %s не активирован", loginDto.getEmail()));
         }
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
