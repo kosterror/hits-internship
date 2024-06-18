@@ -16,8 +16,10 @@ import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
 import ru.tsu.hits.hitsinternship.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -69,15 +71,16 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public void registerStudents(CreateStudentsRequest request) {
+        checkEmailsForExisting(request);
+
         var group = groupService.getGroupEntity(request.getGroupId());
         var newStudentDtos = request.getStudents();
 
-        for (NewStudentDto dto : newStudentDtos) {
-            if (userRepository.existsByEmail(dto.getEmail())) {
-                throw new ConflictException("Почта %s занята".formatted(dto.getEmail()));
-            }
+        List<UserEntity> studentEntities = new ArrayList<>(newStudentDtos.size());
 
+        for (NewStudentDto dto : newStudentDtos) {
             var user = UserEntity.builder()
                     .fullName(dto.getFullName())
                     .email(dto.getEmail())
@@ -86,9 +89,33 @@ public class AuthService {
                     .group(group)
                     .build();
 
-            userRepository.save(user);
-            emailService.sendActivationLink(user);
+            studentEntities.add(user);
         }
+
+        studentEntities = userRepository.saveAll(studentEntities);
+        log.info("users saved");
+
+        studentEntities.forEach(emailService::sendActivationLink);
+    }
+
+    private void checkEmailsForExisting(CreateStudentsRequest request) {
+        var emails = request.getStudents()
+                .stream()
+                .map(NewStudentDto::getEmail)
+                .collect(Collectors.toSet());
+
+        var existedStudents = userRepository.findAllByEmailIn(emails);
+
+        if (!existedStudents.isEmpty()) {
+            throw new ConflictException("Почты: '%s' уже заняты"
+                    .formatted(existedStudents.stream()
+                            .map(UserEntity::getEmail)
+                            .toList()
+                    )
+            );
+        }
+
+        log.info("Users with same emails not found");
     }
 
     private UserEntity findUser(UUID userId) {
