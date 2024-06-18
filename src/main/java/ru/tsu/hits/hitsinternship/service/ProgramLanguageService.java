@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.programlanguage.NewProgramLanguageDto;
 import ru.tsu.hits.hitsinternship.dto.programlanguage.ProgramLanguageDto;
-import ru.tsu.hits.hitsinternship.entity.ProgramLanguageEntity;
 import ru.tsu.hits.hitsinternship.mapper.ProgramLanguageMapper;
 import ru.tsu.hits.hitsinternship.repository.ProgramLanguageRepository;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,7 +22,7 @@ public class ProgramLanguageService {
     private final ProgramLanguageMapper programLanguageMapper;
 
     public ProgramLanguageDto createProgramLanguage(NewProgramLanguageDto newProgramLanguageDto) {
-        ProgramLanguageEntity programLanguageEntity = programLanguageMapper.newDtoToEntity(newProgramLanguageDto);
+        var programLanguageEntity = programLanguageMapper.newDtoToEntity(newProgramLanguageDto);
         programLanguageRepository.save(programLanguageEntity);
         return programLanguageMapper.entityToDto(programLanguageEntity);
     }
@@ -36,7 +34,7 @@ public class ProgramLanguageService {
     public List<ProgramLanguageDto> getProgramLanguages() {
         return programLanguageRepository.findAll().stream()
                 .map(programLanguageMapper::entityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
