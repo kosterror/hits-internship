@@ -34,10 +34,9 @@ public class ProgramLanguageService {
 
     public void deleteProgramLanguage(UUID programLanguageId) {
         var programLanguage = findById(programLanguageId);
-        if (!isEmpty(programLanguage.getCompanyWishes()) || !isEmpty(programLanguage.getPositions())) {
+        if (!isEmpty(programLanguage.getCompanyWishes())) {
             throw new ConflictException(
-                    "Язык программирования '%s' используется в пожеланиях компании или позициях"
-                            .formatted(programLanguage.getName())
+                    "Язык программирования '%s' используется в пожеланиях компаний".formatted(programLanguage.getName())
             );
         }
 

@@ -31,10 +31,9 @@ public class SpecialityService {
     public void deleteSpeciality(UUID specialityId) {
         var speciality = findById(specialityId);
 
-        if (!isEmpty(speciality.getPositions()) || !isEmpty(speciality.getCompanyWishes())) {
+        if (!isEmpty(speciality.getCompanyWishes())) {
             throw new ConflictException(
-                    "Направление '%s' используется в пожеланиях компаний или позициях студентов"
-                            .formatted(speciality.getName())
+                    "Направление '%s' используется в пожеланиях компаний".formatted(speciality.getName())
             );
         }
 
