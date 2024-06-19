@@ -95,7 +95,15 @@ public class AuthService {
         studentEntities = userRepository.saveAll(studentEntities);
         log.info("users saved");
 
-        studentEntities.forEach(emailService::sendActivationLink);
+        studentEntities.forEach(student -> {
+                    var isSent = emailService.sendActivationLink(student);
+                    if (isSent) {
+                        log.info("Activation link sent {}", student.getId());
+                    } else {
+                        log.info("Failed to sent activation link {}", student.getId());
+                    }
+                }
+        );
     }
 
     private void checkEmailsForExisting(CreateStudentsRequest request) {
