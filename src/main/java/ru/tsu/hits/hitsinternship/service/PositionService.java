@@ -136,7 +136,9 @@ public class PositionService {
     public void checkPermissionWithRole(UUID userId, UUID targetUserId) {
         var user = userService.getUserEntityById(userId);
 
-        if (user.getRoles().contains(Role.STUDENT) && !targetUserId.equals(userId)) {
+        if (user.getRoles().contains(Role.STUDENT)
+                && !targetUserId.equals(userId)
+                && !user.getRoles().contains(Role.DEAN_OFFICER)) {
             throw new ForbiddenException("You don't have permission to do this");
         }
     }
@@ -173,18 +175,22 @@ public class PositionService {
         if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER) {
             throw new BadRequestException("You can't set this position status");
         }
-        if (positionStatus == PositionStatus.ACCEPTED_OFFER || positionStatus == PositionStatus.REJECTED_OFFER) {
-            if (status != PositionStatus.CONFIRMED_RECEIVED_OFFER && status != PositionStatus.ACCEPTED_OFFER && status != PositionStatus.REJECTED_OFFER) {
-                throw new BadRequestException("You can't set this position status," +
-                        "until the coordinator confirms that the offer has been sent");
-            }
+        if ((positionStatus == PositionStatus.ACCEPTED_OFFER
+                || positionStatus == PositionStatus.REJECTED_OFFER)
+                && status != PositionStatus.CONFIRMED_RECEIVED_OFFER
+                && status != PositionStatus.ACCEPTED_OFFER
+                && status != PositionStatus.REJECTED_OFFER) {
+            throw new BadRequestException("You can't set this position status," +
+                    "until the coordinator confirms that the offer has been sent");
         }
+
 
     }
 
     private void checkPositionStatus(PositionStatus positionStatus) {
-        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER ||
-                positionStatus == PositionStatus.ACCEPTED_OFFER || positionStatus == PositionStatus.REJECTED_OFFER) {
+        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER
+                || positionStatus == PositionStatus.ACCEPTED_OFFER
+                || positionStatus == PositionStatus.REJECTED_OFFER) {
             throw new BadRequestException("You can't set this position status");
         }
 
