@@ -11,6 +11,7 @@ import ru.tsu.hits.hitsinternship.dto.user.NewStudentDto;
 import ru.tsu.hits.hitsinternship.dto.user.NewUserDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
+import ru.tsu.hits.hitsinternship.entity.UserStatus;
 import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.exception.UnauthorizedException;
@@ -43,6 +44,7 @@ public class AuthService {
                 .email(dto.getEmail())
                 .isActive(false)
                 .roles(dto.getRoles())
+                .status(UserStatus.IN_SEARCHING)
                 .build();
 
         user = userRepository.save(user);
@@ -87,6 +89,7 @@ public class AuthService {
                     .isActive(false)
                     .roles(List.of(Role.STUDENT))
                     .group(group)
+                    .status(UserStatus.IN_SEARCHING)
                     .build();
 
             studentEntities.add(user);
