@@ -1,7 +1,5 @@
 package ru.tsu.hits.hitsinternship.specification;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import lombok.experimental.UtilityClass;
@@ -15,30 +13,32 @@ import java.util.UUID;
 public class UserSpecification {
 
     public static Specification<UserEntity> hasFullName(String fullName) {
-        return (Root<UserEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder)
-                -> criteriaBuilder.like(root.get(UserEntity_.FULL_NAME), "%" + fullName + "%");
+        return (root, query, builder) ->
+                builder.like(
+                        builder.lower(root.get(UserEntity_.FULL_NAME)),
+                        "%" + (fullName == null ? null : fullName.toLowerCase()) + "%"
+                );
     }
 
     public static Specification<UserEntity> isActive(Boolean isActive) {
-        return (Root<UserEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder)
-                -> criteriaBuilder.equal(root.get(UserEntity_.IS_ACTIVE), isActive);
+        return (root, query, builder) ->
+                builder.equal(
+                        root.get(UserEntity_.IS_ACTIVE),
+                        isActive
+                );
     }
 
     public static Specification<UserEntity> hasRoles(List<Role> roles) {
-        return (Root<UserEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder)
-                -> root.join(UserEntity_.ROLES).in(roles);
+        return (root, query, criteriaBuilder) -> root
+                .join(UserEntity_.ROLES)
+                .in(roles);
     }
 
     public static Specification<UserEntity> inGroupIds(List<UUID> groupIds) {
-        return (Root<UserEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder)
-                -> root.join(UserEntity_.GROUP).get(GroupEntity_.ID).in(groupIds);
-    }
-
-    public static Specification<UserEntity> withoutPracticesInSemester(UUID semesterId) {
-        return (root, query, builder)
-                -> builder.notEqual(root.join(UserEntity_.PRACTICES)
-                .get(PracticeEntity_.SEMESTER)
-                .get(SemesterEntity_.ID), semesterId);
+        return (root, query, builder) -> root
+                .join(UserEntity_.GROUP)
+                .get(GroupEntity_.ID)
+                .in(groupIds);
     }
 
     public static Specification<UserEntity> hasNoPracticeInSemesterAndInGroupIds(UUID semesterId,

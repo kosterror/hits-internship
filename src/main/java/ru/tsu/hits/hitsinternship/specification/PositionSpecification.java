@@ -34,9 +34,8 @@ public class PositionSpecification {
     public static Specification<PositionEntity> fullNameLike(String fullName) {
         return (root, query, builder) ->
                 builder.like(
-                        root.get(PositionEntity_.USER)
-                                .get(UserEntity_.FULL_NAME),
-                        "%" + fullName + "%"
+                        builder.lower(root.get(PositionEntity_.USER).get(UserEntity_.FULL_NAME)),
+                        "%" + (fullName == null ? null : fullName.toLowerCase()) + "%"
                 );
     }
 
