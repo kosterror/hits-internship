@@ -102,8 +102,11 @@ public class PracticeService {
 
         studentsFromGroups.removeAll(studentsWithPractice);
         var studentsWithoutPractice = studentsFromGroups.stream()
-                .map(userMapper::entityToDto)
-                .toList();
+                .map(student -> userMapper.entityToDto(
+                                student,
+                                userService.getCurrentPractice(student)
+                        )
+                ).toList();
 
         var practices = studentsWithPractice.stream()
                 .map(student -> {
@@ -135,7 +138,7 @@ public class PracticeService {
                         .map(practiceMapper::entityToDto)
                         .toList(),
                 usersWithoutPractices.stream()
-                        .map(userMapper::entityToDto)
+                        .map(user -> userMapper.entityToDto(user, userService.getCurrentPractice(user)))
                         .toList()
         );
     }

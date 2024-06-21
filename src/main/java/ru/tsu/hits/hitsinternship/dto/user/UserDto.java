@@ -3,6 +3,7 @@ package ru.tsu.hits.hitsinternship.dto.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import ru.tsu.hits.hitsinternship.dto.group.GroupDto;
+import ru.tsu.hits.hitsinternship.dto.practice.BasePracticeDto;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.entity.UserStatus;
 
@@ -35,5 +36,8 @@ public class UserDto {
 
     @Schema(description = "Группа", requiredMode = NOT_REQUIRED)
     private GroupDto group;
+
+    @Schema(description = "Текущее место практики", requiredMode = NOT_REQUIRED)
+    private BasePracticeDto currentPractice;
 
 }

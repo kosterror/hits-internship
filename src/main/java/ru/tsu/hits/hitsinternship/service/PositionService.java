@@ -275,7 +275,7 @@ public class PositionService {
                 .map(user -> {
                     List<PositionEntity> positions = positionRepository.findAllByUserId(user.getId());
                     return FinalPositionDto.builder()
-                            .student(userMapper.entityToDto(user))
+                            .student(userMapper.entityToDto(user, userService.getCurrentPractice(user)))
                             .positions(positions.stream()
                                     .filter(p -> p.getPositionStatus() == PositionStatus.ACCEPTED_OFFER)
                                     .map(positionMapper::entityToDto)

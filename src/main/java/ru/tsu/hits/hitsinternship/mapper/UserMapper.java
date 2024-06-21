@@ -1,19 +1,36 @@
 package ru.tsu.hits.hitsinternship.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.ReportingPolicy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
+import ru.tsu.hits.hitsinternship.entity.PracticeEntity;
 import ru.tsu.hits.hitsinternship.entity.UserEntity;
 
-@Mapper(
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
-public interface UserMapper {
+@Component
+@RequiredArgsConstructor
+public class UserMapper {
 
-    @Mapping(target = "isActive", source = "active")
-    UserDto entityToDto(UserEntity entity);
+    private final GroupMapper groupMapper;
+    private final PracticeMapper practiceMapper;
+
+    public UserDto entityToDto(UserEntity user, PracticeEntity practice) {
+        if (user == null) {
+            return null;
+        }
+
+        UserDto userDto = new UserDto();
+
+        userDto.setId(user.getId());
+        userDto.setFullName(user.getFullName());
+        userDto.setEmail(user.getEmail());
+        userDto.setIsActive(user.isActive());
+        userDto.setStatus(user.getStatus());
+        userDto.setRoles(user.getRoles());
+        userDto.setGroup(groupMapper.entityToDto(user.getGroup()));
+        userDto.setCurrentPractice(practiceMapper.entityToBaseDto(practice));
+
+        return userDto;
+    }
+
 
 }
