@@ -13,8 +13,12 @@ import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.position.FinalPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
-import ru.tsu.hits.hitsinternship.entity.*;
+import ru.tsu.hits.hitsinternship.entity.PositionEntity;
+import ru.tsu.hits.hitsinternship.entity.PositionStatus;
+import ru.tsu.hits.hitsinternship.entity.Role;
+import ru.tsu.hits.hitsinternship.entity.UserEntity;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
+import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
@@ -22,9 +26,14 @@ import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
 import ru.tsu.hits.hitsinternship.specification.PositionSpecification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static ru.tsu.hits.hitsinternship.entity.PositionStatus.*;
+import static ru.tsu.hits.hitsinternship.entity.UserStatus.GOT_INTERNSHIP;
+import static ru.tsu.hits.hitsinternship.entity.UserStatus.IN_SEARCHING;
 
 @Slf4j
 @Service
@@ -43,18 +52,17 @@ public class PositionService {
 
 
     public void deletePosition(UUID positionId, UUID userId) {
-        checkPermission(userId, positionId);
-
-        if (!positionRepository.existsById(positionId)) {
-            throw new NotFoundException("Position with id " + positionId + " not found");
-        }
-
-        positionRepository.deleteById(positionId);
+        var position = getPositionForUser(positionId, userId);
+        positionRepository.delete(position);
     }
 
     public PositionDto createPosition(NewPositionDto newPositionDto, UUID userId) {
-        checkPositionStatus(newPositionDto.getPositionStatus());
-        checkOriginality(newPositionDto, userId);
+        if (!isStatusAvailableForCreating(newPositionDto.getPositionStatus())) {
+            throw new BadRequestException("This statuses '%s, %s, %s' aren't available for creating new positions"
+                    .formatted(CONFIRMED_RECEIVED_OFFER, ACCEPTED_OFFER, REJECTED_OFFER)
+            );
+        }
+
         checkPriority(newPositionDto.getPriority(), userId);
 
         var company = companyWishesService.findCompanyById(newPositionDto.getCompanyId());
@@ -87,39 +95,51 @@ public class PositionService {
     public PositionDto updatePositionStatus(UUID positionId,
                                             PositionStatus positionStatus,
                                             UUID userId) {
-        checkPermission(userId, positionId);
-        var position = findPositionById(positionId);
-        checkPositionStatus(positionStatus, position);
+        var position = getPositionForUser(positionId, userId);
         position.setPositionStatus(positionStatus);
 
-        if (positionStatus == PositionStatus.ACCEPTED_OFFER) {
-            userService.updateUserStatus(userId, UserStatus.GOT_INTERNSHIP);
+        var isExistPositionWithAcceptedOffer = getStudentPositions(userId, userId)
+                .stream()
+                .anyMatch(p -> p.getPositionStatus().equals(ACCEPTED_OFFER));
+
+        if (ACCEPTED_OFFER.equals(positionStatus) && isExistPositionWithAcceptedOffer) {
+            throw new ConflictException("У вас уже есть принятый оффер, нельзя принять другой");
         }
 
-        if (position.getPositionStatus() != PositionStatus.ACCEPTED_OFFER
-                && position.getPositionStatus() != positionStatus) {
-            userService.updateUserStatus(userId, UserStatus.IN_SEARCHING);
+        if (ACCEPTED_OFFER.equals(positionStatus)) {
+            userService.updateUserStatus(userId, GOT_INTERNSHIP);
+            position = positionRepository.save(position);
+        } else if (isExistPositionWithAcceptedOffer) {
+            position = positionRepository.save(position);
+        } else {
+            position = positionRepository.save(position);
+            userService.updateUserStatus(userId, IN_SEARCHING);
         }
-
-        positionRepository.save(position);
 
         return positionMapper.entityToDto(position);
     }
 
-    public List<PositionDto> updatePositionPriority(List<UUID> positionIdList, UUID userId) {
-        checkPosition(userId, positionIdList);
+    private PositionEntity getPositionForUser(UUID positionId, UUID userId) {
+        return positionRepository.findByIdAndUserId(positionId, userId)
+                .orElseThrow(() -> new NotFoundException(
+                                "Position '%s' related to user '%s' not found".formatted(positionId, userId)
+                        )
+                );
+    }
 
-        for (UUID uuid : positionIdList) {
-            checkPermission(userId, uuid);
-        }
+    public List<PositionDto> updatePositionPriority(List<UUID> positionIdList, UUID userId) {
+        var positions = new ArrayList<PositionEntity>(positionIdList.size());
 
         for (int i = 0; i < positionIdList.size(); i++) {
-            var position = findPositionById(positionIdList.get(i));
+            var positionId = positionIdList.get(i);
+            var position = getPositionForUser(positionId, userId);
+
             position.setPriority(i);
-            positionRepository.save(position);
+
+            positions.add(position);
         }
 
-        return positionRepository.findAllByUserId(userId)
+        return positionRepository.saveAll(positions)
                 .stream()
                 .map(positionMapper::entityToDto)
                 .toList();
@@ -127,9 +147,11 @@ public class PositionService {
 
     public PositionDto confirmReceivedOffer(UUID positionId) {
         var position = findPositionById(positionId);
-        position.setPositionStatus(PositionStatus.CONFIRMED_RECEIVED_OFFER);
-        positionRepository.save(position);
 
+        position.setPositionStatus(CONFIRMED_RECEIVED_OFFER);
+
+        positionRepository.save(position);
+        log.info("Offer for position {} confirmed", positionId);
         return positionMapper.entityToDto(position);
     }
 
@@ -143,80 +165,26 @@ public class PositionService {
         }
     }
 
-    private void checkPermission(UUID userId, UUID positionId) {
-        var position = findPositionById(positionId);
-
-        if (!position.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("You don't have permission to do this");
-        }
-    }
-
     private PositionEntity findPositionById(UUID positionId) {
         return positionRepository.findById(positionId)
                 .orElseThrow(() -> new NotFoundException("Position with such id does not exist"));
 
     }
 
-    private void checkOriginality(NewPositionDto newPositionDto, UUID userId) {
-        var positions = positionRepository.findAllByUserId(userId);
-
-        for (var position : positions) {
-            if (position.getCompany().getId().equals(newPositionDto.getCompanyId()) &&
-                    position.getSpeciality().getId().equals(newPositionDto.getSpecialityId()) &&
-                    !checkProgramLanguage(position.getProgramLanguage(), newPositionDto.getProgramLanguageId())
-            ) {
-                throw new BadRequestException("You already have a position with such parameters");
-            }
-        }
-    }
-
-    public void checkPositionStatus(PositionStatus positionStatus, PositionEntity position) {
-        var status = position.getPositionStatus();
-        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER) {
-            throw new BadRequestException("You can't set this position status");
-        }
-        if ((positionStatus == PositionStatus.ACCEPTED_OFFER
-                || positionStatus == PositionStatus.REJECTED_OFFER)
-                && status != PositionStatus.CONFIRMED_RECEIVED_OFFER
-                && status != PositionStatus.ACCEPTED_OFFER
-                && status != PositionStatus.REJECTED_OFFER) {
-            throw new BadRequestException("You can't set this position status," +
-                    "until the coordinator confirms that the offer has been sent");
-        }
-
-
-    }
-
-    private void checkPositionStatus(PositionStatus positionStatus) {
-        if (positionStatus == PositionStatus.CONFIRMED_RECEIVED_OFFER
-                || positionStatus == PositionStatus.ACCEPTED_OFFER
-                || positionStatus == PositionStatus.REJECTED_OFFER) {
-            throw new BadRequestException("You can't set this position status");
-        }
-
-    }
-
-    private boolean checkProgramLanguage(ProgramLanguageEntity programLanguage, UUID programLanguageId) {
-        if (programLanguage != null) {
-            return programLanguage.getId().equals(programLanguageId);
-        }
-
-        return programLanguageId != null;
+    private boolean isStatusAvailableForCreating(PositionStatus positionStatus) {
+        return !CONFIRMED_RECEIVED_OFFER.equals(positionStatus)
+                && !ACCEPTED_OFFER.equals(positionStatus)
+                && !REJECTED_OFFER.equals(positionStatus);
     }
 
     private void checkPriority(Integer priority, UUID userId) {
-        positionRepository.findAllByUserId(userId).stream()
+        positionRepository.findAllByUserId(userId)
+                .stream()
                 .filter(practice -> Objects.equals(practice.getPriority(), priority))
                 .findAny()
                 .ifPresent(practice -> {
                     throw new BadRequestException("Priority " + priority + " already exists");
                 });
-    }
-
-    private void checkPosition(UUID userId, List<UUID> positionIdList) {
-        if (!Objects.equals(positionRepository.findAllByUserId(userId).size(), positionIdList.size())) {
-            throw new BadRequestException("Position list is not correct");
-        }
     }
 
     public PaginationResponse<PositionDto> getPositions(List<UUID> companyIds,
@@ -277,7 +245,7 @@ public class PositionService {
                     return FinalPositionDto.builder()
                             .student(userMapper.entityToDto(user, userService.getCurrentPractice(user)))
                             .positions(positions.stream()
-                                    .filter(p -> p.getPositionStatus() == PositionStatus.ACCEPTED_OFFER)
+                                    .filter(p -> p.getPositionStatus() == ACCEPTED_OFFER)
                                     .map(positionMapper::entityToDto)
                                     .toList())
                             .build();

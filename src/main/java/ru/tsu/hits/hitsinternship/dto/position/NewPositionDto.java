@@ -21,8 +21,10 @@ public class NewPositionDto {
     private PositionStatus positionStatus;
 
     private UUID programLanguageId;
+
     @NotNull
     private UUID specialityId;
+
     @NotNull
     private UUID companyId;
 }
