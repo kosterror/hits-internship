@@ -16,7 +16,6 @@ import ru.tsu.hits.hitsinternship.mapper.ChangePracticeApplicationMapper;
 import ru.tsu.hits.hitsinternship.repository.ChangePracticeApplicationRepository;
 
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,7 +47,9 @@ public class ChangePracticeApplicationService {
                 .newDtoToEntity(newApplicationDto);
 
         application.setAuthor(userService.getUserEntityById(authorId));
-        application.setPartner(companyService.findCompanyById(newApplicationDto.getCompanyId()));
+        if (newApplicationDto.getCompanyId() != null) {
+            application.setPartner(companyService.findCompanyById(newApplicationDto.getCompanyId()));
+        }
         application.setSemester(semesterService.getSemesterEntity(newApplicationDto.getSemesterId()));
         checkDeadline(application.getSemester());
         application.setStatus(ChangePracticeApplicationStatus.QUEUE);
@@ -116,7 +117,7 @@ public class ChangePracticeApplicationService {
 
     private void checkDeadline(SemesterEntity semester) {
 
-        if (semester.getChangeCompanyApplicationDeadline().isAfter(ChronoLocalDateTime.from(LocalDateTime.now()))) {
+        if (semester.getChangeCompanyApplicationDeadline().isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Срок подачи заявок на изменение места практики истек");
         }
     }
@@ -136,5 +137,6 @@ public class ChangePracticeApplicationService {
             throw new BadRequestException("Нельзя изменить заявку с данным статусом");
         }
     }
+
 
 }
