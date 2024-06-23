@@ -10,11 +10,14 @@ spring:
       ddl-auto: validate
     show-sql: false
   mail:
-    host: smtp.yandex.ru
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
-    port: 465
-    protocol: smtps
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
   servlet:
     multipart:
       max-file-size: 200MB
