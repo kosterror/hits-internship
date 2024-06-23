@@ -3,7 +3,6 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,15 +78,6 @@ public class PracticeService {
                         throw new BadRequestException("User already has practice in this semester");
                     }
                 });
-    }
-
-    public List<PracticeDto> getSemesterPractices(UUID semesterId) {
-        return practiceRepository.findAllBySemesterId(
-                        semesterId,
-                        Sort.by(Sort.Order.asc("user.fullName"))
-                ).stream()
-                .map(practiceMapper::entityToDto)
-                .toList();
     }
 
     public PracticeReportDto getPractices(UUID semesterId, List<UUID> groupIds) {
