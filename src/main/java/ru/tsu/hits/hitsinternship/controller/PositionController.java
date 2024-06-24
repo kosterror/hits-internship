@@ -5,6 +5,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +21,8 @@ import ru.tsu.hits.hitsinternship.entity.PositionStatus;
 import ru.tsu.hits.hitsinternship.service.PositionService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,6 +107,22 @@ public class PositionController {
     @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
     public List<FinalPositionDto> getFinalPositions(@RequestParam List<UUID> groupIds) {
         return positionService.getFinalPositions(groupIds);
+    }
+
+    @Operation(summary = "Скачать файл с позициями в конечном статусе", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping(value = "/final-download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'CURATOR', 'COMPANY_OFFICER')")
+    public ResponseEntity<Resource> downloadFinalPositions(@RequestParam List<UUID> groupIds) throws IOException {
+        var file = positionService.downloadFinalPositions(groupIds);
+
+        var contentDisposition = ContentDisposition.builder("file")
+                .filename("позиции в конечном статусе.xlsx", StandardCharsets.UTF_8)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new ByteArrayResource(file));
     }
 
 }

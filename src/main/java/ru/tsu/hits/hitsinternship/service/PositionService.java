@@ -3,12 +3,13 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dhatim.fastexcel.Workbook;
+import org.dhatim.fastexcel.Worksheet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.position.FinalPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
@@ -26,10 +27,13 @@ import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
 import ru.tsu.hits.hitsinternship.specification.PositionSpecification;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ru.tsu.hits.hitsinternship.entity.PositionStatus.*;
 import static ru.tsu.hits.hitsinternship.entity.UserStatus.GOT_INTERNSHIP;
@@ -235,7 +239,6 @@ public class PositionService {
                 .build();
     }
 
-    @Transactional
     public List<FinalPositionDto> getFinalPositions(List<UUID> groupIds) {
         List<UserEntity> users = userService.getUsersByGroupIds(groupIds);
 
@@ -251,5 +254,34 @@ public class PositionService {
                             .build();
                 })
                 .toList();
+    }
+
+    public byte[] downloadFinalPositions(List<UUID> groupIds) throws IOException {
+        var finalPositions = getFinalPositions(groupIds);
+        // Группа | ФИО | Компания
+        // finalPositions.get(0).getStudent().getGroup().getName() | finalPositions.get(0).getStudent().getFullName() | всех из finalPositions.get(0).getPositions() склеить через ";\n"
+
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+             Workbook book = new Workbook(os, "hits-internship-backend", "1.0");
+             Worksheet worksheet = book.newWorksheet("Лист 1")) {
+            worksheet.value(0, 0, "Группа");
+            worksheet.value(0, 1, "ФИО");
+            worksheet.value(0, 2, "Компания");
+
+            for (int i = 0; i < finalPositions.size(); i++) {
+                FinalPositionDto position = finalPositions.get(i);
+                worksheet.value(i + 1, 0, position.getStudent().getGroup().getName());
+                worksheet.value(i + 1, 1, position.getStudent().getFullName());
+
+                String companies = position.getPositions().stream()
+                        .map(p -> p.getCompany().getName())
+                        .collect(Collectors.joining(";\n"));
+                worksheet.value(i + 1, 2, companies);
+            }
+
+            book.finish();
+            return os.toByteArray();
+
+        }
     }
 }
