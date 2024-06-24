@@ -67,9 +67,9 @@ public class UserController {
                                                 @RequestParam(required = false) Boolean isActive,
                                                 @RequestParam(required = false) List<Role> roles,
                                                 @RequestParam(required = false) List<UUID> groupIds,
-                                                @RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "50") int size) {
-        return userService.getUsers(fullName, isActive, roles, groupIds, page, size);
+                                                @RequestParam(defaultValue = "0") int pageNumber,
+                                                @RequestParam(defaultValue = "50") int pageSize) {
+        return userService.getUsers(fullName, isActive, roles, groupIds, pageNumber, pageSize);
     }
 
 

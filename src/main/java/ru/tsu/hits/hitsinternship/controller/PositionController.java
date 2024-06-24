@@ -83,16 +83,16 @@ public class PositionController {
                                                         @RequestParam(required = false) String fullName,
                                                         @RequestParam(required = false) List<UUID> groupIds,
                                                         @RequestParam(required = false) PositionStatus positionStatus,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size) {
+                                                        @RequestParam(defaultValue = "0") int pageNumber,
+                                                        @RequestParam(defaultValue = "10") int pageSize) {
         return positionService.getPositions(companyIds,
                 specialityIds,
                 programLanguageIds,
                 fullName,
                 groupIds,
                 positionStatus,
-                page,
-                size);
+                pageNumber,
+                pageSize);
     }
 
     @Operation(summary = "Получить позиции в конечном статусе", security = @SecurityRequirement(name = "BearerAuth"))

@@ -40,9 +40,9 @@ public class SolutionController {
     public PaginationResponse<SolutionDto> getSolution(@PathVariable UUID taskId,
                                                        @RequestParam(required = false) List<UUID> userIds,
                                                        @RequestParam(required = false) List<SolutionState> solutionStates,
-                                                       @RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
-        return solutionService.getTaskSolutions(taskId, userIds, solutionStates, page, size);
+                                                       @RequestParam(defaultValue = "0") int pageNumber,
+                                                       @RequestParam(defaultValue = "10") int pageSize) {
+        return solutionService.getTaskSolutions(taskId, userIds, solutionStates, pageNumber, pageSize);
     }
 
     @Operation(summary = "Получить мои ответы на задание", security = @SecurityRequirement(name = "BearerAuth"))
