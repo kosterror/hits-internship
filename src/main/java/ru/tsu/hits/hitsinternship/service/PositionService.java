@@ -236,6 +236,7 @@ public class PositionService {
                 .pageNumber(positions.getNumber())
                 .pageSize(positions.getSize())
                 .elements(positionDtos)
+                .totalSize(positions.getTotalElements())
                 .build();
     }
 

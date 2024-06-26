@@ -104,6 +104,7 @@ public class UserService {
                 .pageNumber(pageNumber)
                 .pageSize(pageSize)
                 .elements(userDtos)
+                .totalSize(page.getTotalElements())
                 .build();
     }
 

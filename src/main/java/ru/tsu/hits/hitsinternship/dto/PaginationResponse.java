@@ -18,6 +18,9 @@ public class PaginationResponse<T> {
     @Schema(description = "Размер страницы", requiredMode = REQUIRED)
     private int pageSize;
 
+    @Schema(description = "Всего элементов", requiredMode = REQUIRED)
+    private long totalSize;
+
     @Schema(description = "Элементы", requiredMode = REQUIRED)
     private List<T> elements;
 

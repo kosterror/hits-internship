@@ -94,6 +94,7 @@ public class SolutionService {
                 .pageNumber(page)
                 .pageSize(size)
                 .elements(solutionDtos)
+                .totalSize(solutions.getTotalElements())
                 .build();
     }
 
