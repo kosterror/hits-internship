@@ -50,6 +50,7 @@ public class UserEntity {
     private List<PracticeEntity> practices;
 
     @OneToMany(mappedBy = "author")
+    @OrderBy("creationDate DESC")
     private List<ChangePracticeApplicationEntity> changePracticeApplicationEntities;
 
     @OneToMany(mappedBy = "checkingEmployee")

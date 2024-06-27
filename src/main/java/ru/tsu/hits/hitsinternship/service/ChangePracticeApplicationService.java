@@ -18,7 +18,6 @@ import ru.tsu.hits.hitsinternship.repository.ChangePracticeApplicationRepository
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,17 +75,17 @@ public class ChangePracticeApplicationService {
     }
 
     public List<ChangePracticeApplicationDto> getChangePracticeApplications() {
-
         return changePracticeApplicationRepository.findAll().stream()
                 .map(changePracticeApplicationMapper::entityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ChangePracticeApplicationDto> getStudentChangePracticeApplications(UUID userId) {
-
-        return changePracticeApplicationRepository.getAllByAuthor(userService.getUserEntityById(userId)).stream()
+        return userService.getUserEntityById(userId)
+                .getChangePracticeApplicationEntities()
+                .stream()
                 .map(changePracticeApplicationMapper::entityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ChangePracticeApplicationEntity getChangePracticeApplicationEntity(UUID applicationId) {
