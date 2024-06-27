@@ -38,11 +38,11 @@ public class SolutionController {
     @Operation(summary = "Получить ответы на задание", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public PaginationResponse<SolutionDto> getSolution(@PathVariable UUID taskId,
-                                                       @RequestParam(required = false) List<UUID> userIds,
+                                                       @RequestParam(required = false) String fullName,
                                                        @RequestParam(required = false) List<SolutionState> solutionStates,
                                                        @RequestParam(defaultValue = "0") int pageNumber,
                                                        @RequestParam(defaultValue = "10") int pageSize) {
-        return solutionService.getTaskSolutions(taskId, userIds, solutionStates, pageNumber, pageSize);
+        return solutionService.getTaskSolutions(taskId, fullName, solutionStates, pageNumber, pageSize);
     }
 
     @Operation(summary = "Получить мои ответы на задание", security = @SecurityRequirement(name = "BearerAuth"))

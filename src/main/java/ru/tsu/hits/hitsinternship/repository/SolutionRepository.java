@@ -19,13 +19,13 @@ public interface SolutionRepository extends JpaRepository<SolutionEntity, UUID> 
                                                    List<SolutionState> solutionStates,
                                                    Pageable pageable);
 
-    Page<SolutionEntity> findAllByTaskIdAndAuthorIdIn(UUID taskId,
-                                                      List<UUID> userIds,
-                                                      Pageable pageable);
+    Page<SolutionEntity> findAllByTaskIdAndAuthorFullNameContainsIgnoreCase(UUID taskId,
+                                                                            String fullName,
+                                                                            Pageable pageable);
 
-    Page<SolutionEntity> findAllByTaskIdAndAuthorIdInAndStateIn(UUID taskId,
-                                                                List<UUID> userIds,
-                                                                List<SolutionState> solutionStates,
-                                                                Pageable pageable);
+    Page<SolutionEntity> findAllByTaskIdAndAuthorFullNameContainsIgnoreCaseAndStateIn(UUID taskId,
+                                                                                      String fullName,
+                                                                                      List<SolutionState> solutionStates,
+                                                                                      Pageable pageable);
 
 }

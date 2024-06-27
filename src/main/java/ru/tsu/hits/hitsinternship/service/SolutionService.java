@@ -67,7 +67,7 @@ public class SolutionService {
     }
 
     public PaginationResponse<SolutionDto> getTaskSolutions(UUID taskId,
-                                                            List<UUID> userIds,
+                                                            String fullName,
                                                             List<SolutionState> solutionStates,
                                                             int page,
                                                             int size
@@ -76,14 +76,21 @@ public class SolutionService {
         Page<SolutionEntity> solutions;
 
 
-        if (userIds == null && solutionStates == null) {
+        if (fullName == null && solutionStates == null) {
             solutions = solutionRepository.findAllByTaskId(taskId, pageable);
-        } else if (userIds == null) {
+        } else if (fullName == null) {
             solutions = solutionRepository.findAllByTaskIdAndStateIn(taskId, solutionStates, pageable);
         } else if (solutionStates == null) {
-            solutions = solutionRepository.findAllByTaskIdAndAuthorIdIn(taskId, userIds, pageable);
+            solutions = solutionRepository.findAllByTaskIdAndAuthorFullNameContainsIgnoreCase(taskId,
+                    fullName,
+                    pageable
+            );
         } else {
-            solutions = solutionRepository.findAllByTaskIdAndAuthorIdInAndStateIn(taskId, userIds, solutionStates, pageable);
+            solutions = solutionRepository.findAllByTaskIdAndAuthorFullNameContainsIgnoreCaseAndStateIn(taskId,
+                    fullName,
+                    solutionStates,
+                    pageable
+            );
         }
 
         List<SolutionDto> solutionDtos = solutions.stream()
