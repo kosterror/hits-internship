@@ -37,6 +37,8 @@ public class SolutionService {
                                       UUID userId) {
         var task = taskService.getTaskEntity(taskId);
         checkTaskDeadline(task);
+        checkExistingSolutions(taskId, userId);
+
         var user = userService.getUserEntityById(userId);
 
         var solutionBuilder = SolutionEntity.builder()
@@ -58,6 +60,13 @@ public class SolutionService {
         var solution = solutionRepository.save(solutionBuilder.build());
 
         return solutionMapper.toDto(solution);
+    }
+
+    private void checkExistingSolutions(UUID taskId, UUID userId) {
+        var existedSolutions = solutionRepository.findAllByTaskIdAndAuthorId(taskId, userId);
+        if (!existedSolutions.isEmpty()) {
+            throw new ConflictException("У вас уже есть решение на это задание");
+        }
     }
 
     private void checkTaskDeadline(TaskEntity task) {
