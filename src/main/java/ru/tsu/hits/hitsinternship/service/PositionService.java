@@ -246,34 +246,18 @@ public class PositionService {
             Sort.Direction direction = isSortedByPositionStatusAsc
                     ? Sort.Direction.ASC
                     : Sort.Direction.DESC;
+
             pageable = PageRequest.of(page,
                     size,
-                    Sort.by(
-                            new Sort.Order(
-                                    direction,
-                                    PositionEntity_.POSITION_STATUS,
-                                    true,
-                                    Sort.NullHandling.NULLS_LAST
-                            ),
-                            new Sort.Order(
-                                    direction,
-                                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME,
-                                    true,
-                                    Sort.NullHandling.NULLS_LAST
-                            )
-                    )
+                    direction,
+                    PositionEntity_.POSITION_STATUS,
+                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME
             );
         } else {
             pageable = PageRequest.of(page,
                     size,
-                    Sort.by(
-                            new Sort.Order(
-                                    Sort.Direction.ASC,
-                                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME,
-                                    true,
-                                    Sort.NullHandling.NULLS_LAST
-                            )
-                    )
+                    Sort.Direction.ASC,
+                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME
             );
         }
         return pageable;
