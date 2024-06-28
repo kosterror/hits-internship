@@ -5,12 +5,20 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.practice.*;
 import ru.tsu.hits.hitsinternship.service.PracticeService;
 import ru.tsu.hits.hitsinternship.util.SecurityUtil;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +45,23 @@ public class PracticeController {
                                           @RequestParam List<UUID> groupIds
     ) {
         return practiceService.getPractices(semesterId, groupIds);
+    }
+
+    @Operation(summary = "Скачать отчет по практике", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/practices/reports-download")
+    public ResponseEntity<Resource> downloadPracticeReport(@RequestParam UUID semesterId,
+                                                           @RequestParam List<UUID> groupIds
+    ) throws IOException {
+        var file = practiceService.downloadPracticesAndMarks(semesterId, groupIds);
+
+        var contentDisposition = ContentDisposition.builder("file")
+                .filename("отчет.xlsx", StandardCharsets.UTF_8)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new ByteArrayResource(file));
     }
 
     @Operation(summary = "Получить места практики студента", security = @SecurityRequirement(name = "BearerAuth"))
