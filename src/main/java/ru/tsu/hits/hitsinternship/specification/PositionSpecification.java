@@ -1,7 +1,6 @@
 package ru.tsu.hits.hitsinternship.specification;
 
 import lombok.experimental.UtilityClass;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import ru.tsu.hits.hitsinternship.entity.*;
 
@@ -50,26 +49,6 @@ public class PositionSpecification {
     public static Specification<PositionEntity> hasPositionStatus(PositionStatus positionStatus) {
         return (root, query, builder) ->
                 builder.equal(root.get(PositionEntity_.POSITION_STATUS), positionStatus);
-    }
-
-    public static Specification<PositionEntity> orderByPositionStatusAndFullName(Boolean isSortedByPositionStatusAsc) {
-        return (root, query, criteriaBuilder) -> {
-            if (isSortedByPositionStatusAsc != null) {
-                Sort.Direction direction = isSortedByPositionStatusAsc
-                        ? Sort.Direction.ASC
-                        : Sort.Direction.DESC;
-
-                if (direction.isAscending()) {
-                    query.orderBy(criteriaBuilder.asc(root.get(PositionEntity_.POSITION_STATUS)), criteriaBuilder.asc(root.get(PositionEntity_.USER).get(UserEntity_.FULL_NAME)));
-                } else {
-                    query.orderBy(criteriaBuilder.desc(root.get(PositionEntity_.POSITION_STATUS)), criteriaBuilder.asc(root.get(PositionEntity_.USER).get(UserEntity_.FULL_NAME)));
-                }
-            } else {
-                query.orderBy(criteriaBuilder.asc(root.get(PositionEntity_.USER).get(UserEntity_.FULL_NAME)));
-            }
-
-            return null;
-        };
     }
 
 }

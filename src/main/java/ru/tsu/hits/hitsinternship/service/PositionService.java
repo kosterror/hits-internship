@@ -23,7 +23,6 @@ import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.PositionMapper;
 import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.PositionRepository;
-import ru.tsu.hits.hitsinternship.specification.PositionSpecification;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
 import static ru.tsu.hits.hitsinternship.entity.PositionStatus.*;
 import static ru.tsu.hits.hitsinternship.entity.UserStatus.GOT_INTERNSHIP;
 import static ru.tsu.hits.hitsinternship.entity.UserStatus.IN_SEARCHING;
+import static ru.tsu.hits.hitsinternship.specification.PositionSpecification.*;
 
 @Slf4j
 @Service
@@ -201,32 +201,30 @@ public class PositionService {
         Specification<PositionEntity> spec = Specification.where(null);
 
         if (companyIds != null && !companyIds.isEmpty()) {
-            spec = spec.and(PositionSpecification.hasCompanyIds(companyIds));
+            spec = spec.and(hasCompanyIds(companyIds));
         }
 
         if (specialityIds != null && !specialityIds.isEmpty()) {
-            spec = spec.and(PositionSpecification.hasSpecialityIds(specialityIds));
+            spec = spec.and(hasSpecialityIds(specialityIds));
         }
 
         if (programLanguageIds != null && !programLanguageIds.isEmpty()) {
-            spec = spec.and(PositionSpecification.hasProgramLanguageIds(programLanguageIds));
+            spec = spec.and(hasProgramLanguageIds(programLanguageIds));
         }
 
         if (fullName != null && !fullName.isEmpty()) {
-            spec = spec.and(PositionSpecification.fullNameLike(fullName));
+            spec = spec.and(fullNameLike(fullName));
         }
 
         if (groupIds != null && !groupIds.isEmpty()) {
-            spec = spec.and(PositionSpecification.hasGroupIds(groupIds));
+            spec = spec.and(hasGroupIds(groupIds));
         }
 
         if (positionStatus != null) {
-            spec = spec.and(PositionSpecification.hasPositionStatus(positionStatus));
+            spec = spec.and(hasPositionStatus(positionStatus));
         }
 
-        spec.and(PositionSpecification.orderByPositionStatusAndFullName(isSortedByPositionStatusAsc));
-
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = getPageable(page, size, isSortedByPositionStatusAsc);
         Page<PositionEntity> positions = positionRepository.findAll(spec, pageable);
 
         List<PositionDto> positionDtos = positions.stream()
