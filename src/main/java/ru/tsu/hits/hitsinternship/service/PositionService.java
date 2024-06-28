@@ -313,9 +313,9 @@ public class PositionService {
                 worksheet.value(i + 1, 2, companies);
 
                 if (companies.isEmpty()) {
-                    worksheet.style(i + 1, 1).fillColor(Color.YELLOW).set();
-                } else if (position.getPositions().size() > 1) {
                     worksheet.style(i + 1, 1).fillColor(Color.RED).set();
+                } else if (position.getPositions().size() > 1) {
+                    worksheet.style(i + 1, 1).fillColor(Color.YELLOW).set();
                 }
             }
 
