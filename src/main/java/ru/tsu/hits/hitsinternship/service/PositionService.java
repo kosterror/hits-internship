@@ -3,6 +3,7 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dhatim.fastexcel.BorderStyle;
 import org.dhatim.fastexcel.Color;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
@@ -301,21 +302,37 @@ public class PositionService {
             worksheet.value(0, 1, FULL_NAME_LABEL);
             worksheet.value(0, 2, COMPANY_LABEL);
 
+            worksheet.style(0, 0).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
+            worksheet.style(0, 1).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
+            worksheet.style(0, 2).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
 
             for (int i = 0; i < finalPositions.size(); i++) {
                 FinalPositionDto position = finalPositions.get(i);
                 worksheet.value(i + 1, 0, position.getStudent().getGroup().getName());
                 worksheet.value(i + 1, 1, position.getStudent().getFullName());
 
+                worksheet.style(i + 1, 0).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
+                worksheet.style(i + 1, 1).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
+
                 String companies = position.getPositions().stream()
                         .map(p -> p.getCompany().getName())
                         .collect(Collectors.joining(COMPANY_DELIMITER));
                 worksheet.value(i + 1, 2, companies);
 
+                worksheet.style(i + 1, 2).borderStyle(BorderStyle.THIN).borderColor(Color.SMOKY_BLACK).set();
+
                 if (companies.isEmpty()) {
-                    worksheet.style(i + 1, 1).fillColor(Color.RED).set();
+                    worksheet.style(i + 1, 1)
+                            .fillColor(Color.RED)
+                            .borderStyle(BorderStyle.THIN)
+                            .borderColor(Color.SMOKY_BLACK)
+                            .set();
                 } else if (position.getPositions().size() > 1) {
-                    worksheet.style(i + 1, 1).fillColor(Color.YELLOW).set();
+                    worksheet.style(i + 1, 1)
+                            .fillColor(Color.YELLOW)
+                            .borderStyle(BorderStyle.THIN)
+                            .borderColor(Color.SMOKY_BLACK)
+                            .set();
                 }
             }
 
