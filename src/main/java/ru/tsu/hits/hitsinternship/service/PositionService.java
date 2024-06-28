@@ -224,7 +224,9 @@ public class PositionService {
             spec = spec.and(PositionSpecification.hasPositionStatus(positionStatus));
         }
 
-        Pageable pageable = getPageable(page, size, isSortedByPositionStatusAsc);
+        spec.and(PositionSpecification.orderByPositionStatusAndFullName(isSortedByPositionStatusAsc));
+
+        Pageable pageable = PageRequest.of(page, size);
         Page<PositionEntity> positions = positionRepository.findAll(spec, pageable);
 
         List<PositionDto> positionDtos = positions.stream()
