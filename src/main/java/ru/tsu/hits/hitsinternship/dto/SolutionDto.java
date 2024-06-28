@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import ru.tsu.hits.hitsinternship.dto.filemetainfo.FileMetaInfoDto;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
+import ru.tsu.hits.hitsinternship.entity.Mark;
 import ru.tsu.hits.hitsinternship.entity.SolutionState;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class SolutionDto {
     private String comment;
 
     @Schema(description = "Оценка решения", requiredMode = NOT_REQUIRED)
-    private Integer mark;
+    private Mark mark;
 
     @Schema(description = "Состояние решения", requiredMode = REQUIRED)
     private SolutionState state;

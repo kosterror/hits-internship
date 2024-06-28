@@ -22,7 +22,8 @@ public class SolutionEntity {
 
     private String comment;
 
-    private Integer mark;
+    @Enumerated(EnumType.STRING)
+    private Mark mark;
 
     private LocalDateTime dateTime;
 

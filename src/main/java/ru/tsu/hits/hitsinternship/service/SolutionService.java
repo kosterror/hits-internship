@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.NewSolutionDto;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.SolutionDto;
-import ru.tsu.hits.hitsinternship.entity.SolutionEntity;
-import ru.tsu.hits.hitsinternship.entity.SolutionEntity_;
-import ru.tsu.hits.hitsinternship.entity.SolutionState;
-import ru.tsu.hits.hitsinternship.entity.TaskEntity;
+import ru.tsu.hits.hitsinternship.entity.*;
 import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.SolutionMapper;
@@ -152,7 +149,11 @@ public class SolutionService {
 
     public SolutionDto acceptSolution(UUID taskId,
                                       UUID solutionId,
-                                      int mark) {
+                                      Mark mark) {
+        if (mark == Mark.ZERO) {
+            throw new ConflictException("Нельзя поставить оценку 0");
+        }
+
         var solution = getSolutionEntityByTaskIdAndSolutionId(taskId, solutionId);
 
         solution.setMark(mark);
@@ -167,7 +168,7 @@ public class SolutionService {
                                       UUID solutionId) {
         var solution = getSolutionEntityByTaskIdAndSolutionId(taskId, solutionId);
 
-        solution.setMark(0);
+        solution.setMark(Mark.ZERO);
         solution.setState(SolutionState.REJECTED);
 
         solution = solutionRepository.save(solution);

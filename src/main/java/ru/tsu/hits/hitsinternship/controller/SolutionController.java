@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.tsu.hits.hitsinternship.dto.NewSolutionDto;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.SolutionDto;
+import ru.tsu.hits.hitsinternship.entity.Mark;
 import ru.tsu.hits.hitsinternship.entity.SolutionState;
 import ru.tsu.hits.hitsinternship.service.SolutionService;
 
@@ -64,7 +65,7 @@ public class SolutionController {
     @PostMapping("/{solutionId}/accept")
     public SolutionDto acceptSolution(@PathVariable UUID taskId,
                                       @PathVariable UUID solutionId,
-                                      @RequestParam int mark) {
+                                      @RequestParam Mark mark) {
         return solutionService.acceptSolution(taskId, solutionId, mark);
     }
 
