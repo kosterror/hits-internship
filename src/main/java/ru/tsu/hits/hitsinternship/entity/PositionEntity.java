@@ -17,7 +17,7 @@ public class PositionEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private PositionStatus positionStatus;
 
     private Integer priority;

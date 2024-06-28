@@ -8,16 +8,14 @@ import org.dhatim.fastexcel.Worksheet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.position.FinalPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.NewPositionDto;
 import ru.tsu.hits.hitsinternship.dto.position.PositionDto;
-import ru.tsu.hits.hitsinternship.entity.PositionEntity;
-import ru.tsu.hits.hitsinternship.entity.PositionStatus;
-import ru.tsu.hits.hitsinternship.entity.Role;
-import ru.tsu.hits.hitsinternship.entity.UserEntity;
+import ru.tsu.hits.hitsinternship.entity.*;
 import ru.tsu.hits.hitsinternship.exception.BadRequestException;
 import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.ForbiddenException;
@@ -198,7 +196,8 @@ public class PositionService {
                                                         List<UUID> groupIds,
                                                         PositionStatus positionStatus,
                                                         int page,
-                                                        int size) {
+                                                        int size,
+                                                        Boolean isSortedByPositionStatusAsc) {
         Specification<PositionEntity> spec = Specification.where(null);
 
         if (companyIds != null && !companyIds.isEmpty()) {
@@ -225,7 +224,7 @@ public class PositionService {
             spec = spec.and(PositionSpecification.hasPositionStatus(positionStatus));
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = getPageable(page, size, isSortedByPositionStatusAsc);
         Page<PositionEntity> positions = positionRepository.findAll(spec, pageable);
 
         List<PositionDto> positionDtos = positions.stream()
@@ -238,6 +237,46 @@ public class PositionService {
                 .elements(positionDtos)
                 .totalSize(positions.getTotalElements())
                 .build();
+    }
+
+    private Pageable getPageable(int page, int size, Boolean isSortedByPositionStatusAsc) {
+        Pageable pageable;
+
+        if (isSortedByPositionStatusAsc != null) {
+            Sort.Direction direction = isSortedByPositionStatusAsc
+                    ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
+            pageable = PageRequest.of(page,
+                    size,
+                    Sort.by(
+                            new Sort.Order(
+                                    direction,
+                                    PositionEntity_.POSITION_STATUS,
+                                    true,
+                                    Sort.NullHandling.NULLS_LAST
+                            ),
+                            new Sort.Order(
+                                    direction,
+                                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME,
+                                    true,
+                                    Sort.NullHandling.NULLS_LAST
+                            )
+                    )
+            );
+        } else {
+            pageable = PageRequest.of(page,
+                    size,
+                    Sort.by(
+                            new Sort.Order(
+                                    Sort.Direction.ASC,
+                                    PositionEntity_.USER + "." + UserEntity_.FULL_NAME,
+                                    true,
+                                    Sort.NullHandling.NULLS_LAST
+                            )
+                    )
+            );
+        }
+        return pageable;
     }
 
     public List<FinalPositionDto> getFinalPositions(List<UUID> groupIds) {
