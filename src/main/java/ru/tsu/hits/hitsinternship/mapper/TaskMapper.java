@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
+import ru.tsu.hits.hitsinternship.dto.task.MyTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.NewTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.TaskDto;
 import ru.tsu.hits.hitsinternship.entity.TaskEntity;
@@ -18,5 +19,7 @@ public interface TaskMapper {
     TaskEntity toEntity(NewTaskDto dto);
 
     TaskDto toDto(TaskEntity entity);
+
+    MyTaskDto toMyDto(TaskEntity entity);
 
 }

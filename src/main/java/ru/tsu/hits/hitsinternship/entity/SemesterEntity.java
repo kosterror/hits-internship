@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -30,4 +31,8 @@ public class SemesterEntity {
     private LocalDate endDate;
 
     private LocalDateTime changeCompanyApplicationDeadline;
+
+    @OneToMany(mappedBy = "semester", fetch = FetchType.EAGER)
+    @OrderBy("createdAt DESC")
+    private List<TaskEntity> tasks;
 }

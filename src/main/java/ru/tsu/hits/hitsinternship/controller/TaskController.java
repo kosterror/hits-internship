@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.tsu.hits.hitsinternship.dto.task.MyTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.NewTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.TaskDto;
 import ru.tsu.hits.hitsinternship.service.TaskService;
@@ -36,6 +37,13 @@ public class TaskController {
     @GetMapping("/{id}")
     public TaskDto getTask(@PathVariable UUID id) {
         return taskService.getTask(id);
+    }
+
+    @PreAuthorize("hasAnyRole('STUDENT', 'CURATOR', 'DEAN_OFFICER', 'COMPANY_OFFICER')")
+    @Operation(summary = "Получить задания, доступные мне", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/my")
+    public List<MyTaskDto> getMyTasks() {
+        return taskService.getMyTasks(extractId());
     }
 
     @PreAuthorize("hasRole('DEAN_OFFICER')")

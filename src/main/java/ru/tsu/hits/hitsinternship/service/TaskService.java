@@ -3,12 +3,14 @@ package ru.tsu.hits.hitsinternship.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.tsu.hits.hitsinternship.dto.task.MyTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.NewTaskDto;
 import ru.tsu.hits.hitsinternship.dto.task.TaskDto;
 import ru.tsu.hits.hitsinternship.entity.TaskEntity;
 import ru.tsu.hits.hitsinternship.entity.TaskEntity_;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.TaskMapper;
+import ru.tsu.hits.hitsinternship.repository.PracticeRepository;
 import ru.tsu.hits.hitsinternship.repository.TaskRepository;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ public class TaskService {
     private final UserService userService;
     private final FileStorageService fileStorageService;
     private final SemesterService semesterService;
+    private final PracticeRepository practiceRepository;
 
     public TaskDto createTask(UUID userId, NewTaskDto newTaskDto) {
         var entity = taskMapper.toEntity(newTaskDto);
@@ -68,4 +71,14 @@ public class TaskService {
         var task = getTaskEntity(id);
         taskRepository.delete(task);
     }
+
+    public List<MyTaskDto> getMyTasks(UUID userId) {
+        return practiceRepository.findAllByUserId(userId)
+                .stream()
+                .map(practice -> practice.getSemester().getTasks())
+                .flatMap(List::stream)
+                .map(taskMapper::toMyDto)
+                .toList();
+    }
+
 }
