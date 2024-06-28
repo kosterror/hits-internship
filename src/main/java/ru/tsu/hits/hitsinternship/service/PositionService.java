@@ -3,8 +3,10 @@ package ru.tsu.hits.hitsinternship.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dhatim.fastexcel.Color;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,13 @@ import static ru.tsu.hits.hitsinternship.specification.PositionSpecification.*;
 @RequiredArgsConstructor
 public class PositionService {
 
+    public static final String GROUP_LABEL = "Группа";
+    public static final String FULL_NAME_LABEL = "ФИО";
+    public static final String COMPANY_LABEL = "Компания";
+    public static final String WORKSHEET_NAME = "Лист 1";
+    public static final String APP_VERSION = "1.0";
+    public static final String COMPANY_DELIMITER = ";\n";
+
     private final PositionRepository positionRepository;
 
     private final PositionMapper positionMapper;
@@ -52,6 +61,8 @@ public class PositionService {
 
     private final UserService userService;
 
+    @Value("${spring.application.name}")
+    private String appName;
 
     public void deletePosition(UUID positionId, UUID userId) {
         var position = getPositionForUser(positionId, userId);
@@ -282,15 +293,14 @@ public class PositionService {
 
     public byte[] downloadFinalPositions(List<UUID> groupIds) throws IOException {
         var finalPositions = getFinalPositions(groupIds);
-        // Группа | ФИО | Компания
-        // finalPositions.get(0).getStudent().getGroup().getName() | finalPositions.get(0).getStudent().getFullName() | всех из finalPositions.get(0).getPositions() склеить через ";\n"
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-             Workbook book = new Workbook(os, "hits-internship-backend", "1.0");
-             Worksheet worksheet = book.newWorksheet("Лист 1")) {
-            worksheet.value(0, 0, "Группа");
-            worksheet.value(0, 1, "ФИО");
-            worksheet.value(0, 2, "Компания");
+             Workbook book = new Workbook(os, appName, APP_VERSION);
+             Worksheet worksheet = book.newWorksheet(WORKSHEET_NAME)) {
+            worksheet.value(0, 0, GROUP_LABEL);
+            worksheet.value(0, 1, FULL_NAME_LABEL);
+            worksheet.value(0, 2, COMPANY_LABEL);
+
 
             for (int i = 0; i < finalPositions.size(); i++) {
                 FinalPositionDto position = finalPositions.get(i);
@@ -299,13 +309,19 @@ public class PositionService {
 
                 String companies = position.getPositions().stream()
                         .map(p -> p.getCompany().getName())
-                        .collect(Collectors.joining(";\n"));
+                        .collect(Collectors.joining(COMPANY_DELIMITER));
                 worksheet.value(i + 1, 2, companies);
+
+                if (companies.isEmpty()) {
+                    worksheet.style(i + 1, 1).fillColor(Color.YELLOW).set();
+                } else if (position.getPositions().size() > 1) {
+                    worksheet.style(i + 1, 1).fillColor(Color.RED).set();
+                }
             }
 
             book.finish();
-            return os.toByteArray();
 
+            return os.toByteArray();
         }
     }
 }
