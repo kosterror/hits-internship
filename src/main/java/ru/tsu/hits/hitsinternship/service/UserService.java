@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.PaginationResponse;
 import ru.tsu.hits.hitsinternship.dto.user.UserDto;
 import ru.tsu.hits.hitsinternship.entity.*;
+import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
-import ru.tsu.hits.hitsinternship.mapper.CompanyMapper;
 import ru.tsu.hits.hitsinternship.mapper.UserMapper;
 import ru.tsu.hits.hitsinternship.repository.UserRepository;
 import ru.tsu.hits.hitsinternship.specification.UserSpecification;
@@ -32,7 +32,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final GroupService groupService;
     private final PasswordEncoder passwordEncoder;
-    private final CompanyMapper companyMapper;
 
     public UserDto getUserById(UUID id) {
         var user = getUserEntityById(id);
@@ -60,6 +59,10 @@ public class UserService {
     }
 
     public UserDto updateUserRoles(UUID id, Set<Role> roles) {
+        if (!roles.isEmpty() && roles.contains(Role.COMPANY_OFFICER)) {
+            throw new ConflictException("Представитель компании может иметь роль только \"Представитель компании\"");
+        }
+
         var user = getUserEntityById(id);
         user.setRoles(new ArrayList<>(roles));
         user = userRepository.save(user);
