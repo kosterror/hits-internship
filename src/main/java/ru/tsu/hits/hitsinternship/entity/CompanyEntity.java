@@ -1,17 +1,15 @@
 package ru.tsu.hits.hitsinternship.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "company")
 public class CompanyEntity {
@@ -25,4 +23,12 @@ public class CompanyEntity {
     private String websiteLink;
 
     private Boolean isVisible;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "curator_id")
+    private UserEntity curator;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "officer_id")
+    private UserEntity officer;
 }

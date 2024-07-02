@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.company.CompanyDto;
 import ru.tsu.hits.hitsinternship.dto.company.NewCompanyDto;
 import ru.tsu.hits.hitsinternship.entity.CompanyEntity;
+import ru.tsu.hits.hitsinternship.entity.Role;
+import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
 import ru.tsu.hits.hitsinternship.mapper.CompanyMapper;
 import ru.tsu.hits.hitsinternship.repository.CompanyRepository;
@@ -18,8 +20,8 @@ import java.util.UUID;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
-
     private final CompanyMapper companyMapper;
+    private final UserService userService;
 
     public CompanyDto createCompany(NewCompanyDto newCompanyDto) {
         CompanyEntity company = companyMapper.newDtoToEntity(newCompanyDto);
@@ -31,7 +33,6 @@ public class CompanyService {
     }
 
     public CompanyDto updateCompany(UUID companyId, NewCompanyDto newCompanyDto) {
-
         CompanyEntity company = findCompanyById(companyId);
         company.setName(newCompanyDto.getName());
         company.setIsVisible(newCompanyDto.getIsVisible());
@@ -52,4 +53,37 @@ public class CompanyService {
                 .orElseThrow(() -> new NotFoundException("Company with id " + companyId + " not found"));
     }
 
+    public CompanyDto updateCompanyCurator(UUID companyId, UUID curatorId) {
+        var company = getCompanyEntity(companyId);
+        var curator = userService.getUserEntityById(curatorId);
+
+        if (curator.getRoles().size() == 1 && curator.getRoles().getFirst().equals(Role.STUDENT)) {
+            throw new ConflictException("Студент не может стать куратором компании");
+        }
+
+        company.setCurator(curator);
+        company = companyRepository.save(company);
+
+        return companyMapper.entityToDto(company);
+    }
+
+    public CompanyDto updateCompanyOfficer(UUID companyId, UUID officerId) {
+        var company = getCompanyEntity(companyId);
+        var officer = userService.getUserEntityById(officerId);
+
+        if (officer.getRoles().size() == 1 && officer.getRoles().getFirst().equals(Role.STUDENT)) {
+            throw new ConflictException("Студент не может стать представителем компании");
+        }
+
+
+        company.setOfficer(officer);
+        company = companyRepository.save(company);
+
+        return companyMapper.entityToDto(company);
+    }
+
+    public CompanyEntity getCompanyEntity(UUID companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new NotFoundException("Компания с id '%s' не найдена".formatted(companyId)));
+    }
 }
