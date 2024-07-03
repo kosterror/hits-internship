@@ -2,10 +2,13 @@ package ru.tsu.hits.hitsinternship.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.tsu.hits.hitsinternship.dto.company.CompanyDto;
 import ru.tsu.hits.hitsinternship.dto.company.NewCompanyDto;
 import ru.tsu.hits.hitsinternship.entity.CompanyEntity;
+import ru.tsu.hits.hitsinternship.entity.CompanyEntity_;
 import ru.tsu.hits.hitsinternship.entity.Role;
 import ru.tsu.hits.hitsinternship.exception.ConflictException;
 import ru.tsu.hits.hitsinternship.exception.NotFoundException;
@@ -42,7 +45,10 @@ public class CompanyService {
     }
 
     public List<CompanyDto> getCompanies() {
-        return companyRepository.findAll()
+        Pageable pageable = Pageable.unpaged(Sort.by(Sort.Direction.ASC, CompanyEntity_.NAME));
+
+        return companyRepository.findAll(pageable)
+                .getContent()
                 .stream()
                 .map(companyMapper::entityToDto)
                 .toList();
@@ -73,7 +79,7 @@ public class CompanyService {
     public CompanyDto updateCompanyOfficer(UUID companyId, UUID officerId) {
         var company = getCompanyEntity(companyId);
 
-        if (officerId == null){
+        if (officerId == null) {
             company.setOfficer(null);
         } else {
             var officer = userService.getUserEntityById(officerId);
