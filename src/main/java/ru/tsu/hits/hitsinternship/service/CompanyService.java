@@ -77,6 +77,13 @@ public class CompanyService {
             company.setOfficer(null);
         } else {
             var officer = userService.getUserEntityById(officerId);
+            var companies = companyRepository.findAllByOfficer(officer);
+
+            if (companies.size() == 1 && !companies.getFirst().getId().equals(companyId) || companies.size() > 1) {
+                throw new ConflictException(
+                        "%s уже является представителем другой компании".formatted(officer.getFullName())
+                );
+            }
 
             if (officer.getRoles().size() == 1 && officer.getRoles().getFirst().equals(Role.STUDENT)) {
                 throw new ConflictException("Студент не может стать представителем компании");
