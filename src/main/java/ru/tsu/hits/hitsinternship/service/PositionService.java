@@ -148,7 +148,7 @@ public class PositionService {
             var positionId = positionIdList.get(i);
             var position = getPositionForUser(positionId, userId);
 
-            position.setPriority(i);
+            position.setPriority(i + 1);
 
             positions.add(position);
         }
