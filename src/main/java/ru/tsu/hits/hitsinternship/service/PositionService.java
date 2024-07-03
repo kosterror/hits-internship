@@ -109,12 +109,12 @@ public class PositionService {
     public PositionDto updatePositionStatus(UUID positionId,
                                             PositionStatus positionStatus,
                                             UUID userId) {
-        var position = getPositionForUser(positionId, userId);
-        position.setPositionStatus(positionStatus);
-
         var isExistPositionWithAcceptedOffer = getStudentPositions(userId, userId)
                 .stream()
                 .anyMatch(p -> p.getPositionStatus().equals(ACCEPTED_OFFER));
+
+        var position = getPositionForUser(positionId, userId);
+        position.setPositionStatus(positionStatus);
 
         if (ACCEPTED_OFFER.equals(positionStatus) && isExistPositionWithAcceptedOffer) {
             throw new ConflictException("У вас уже есть принятый оффер, нельзя принять другой");
