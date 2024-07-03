@@ -59,7 +59,7 @@ public class UserService {
     }
 
     public UserDto updateUserRoles(UUID id, Set<Role> roles) {
-        if (!roles.isEmpty() && roles.contains(Role.COMPANY_OFFICER)) {
+        if (roles.size() > 1 && roles.contains(Role.COMPANY_OFFICER)) {
             throw new ConflictException("Представитель компании может иметь роль только \"Представитель компании\"");
         }
 
