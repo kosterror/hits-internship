@@ -50,7 +50,7 @@ public class CompanyWishesController {
 
     @Operation(summary = "Получить пожелания компании", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/{companyId}")
-    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR')")
+    @PreAuthorize("hasAnyRole('DEAN_OFFICER', 'COMPANY_OFFICER', 'CURATOR', 'STUDENT')")
     public List<CompanyWishDto> getCompanyWish(@PathVariable UUID companyId) {
         return companyWishesService.getCompanyWishes(companyId);
     }
