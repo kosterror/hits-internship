@@ -59,7 +59,7 @@ public class CompanyController {
     @Operation(summary = "Обновить куратора у компании", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/{companyId}/curators")
     public CompanyDto updateCompanyCurator(@PathVariable UUID companyId,
-                                           @RequestParam UUID curatorId
+                                           @RequestParam(required = false) UUID curatorId
     ) {
         return companyService.updateCompanyCurator(companyId, curatorId);
     }
@@ -68,7 +68,7 @@ public class CompanyController {
     @Operation(summary = "Обновить сотрудника у компании", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/{companyId}/officers")
     public CompanyDto updateCompanyOfficer(@PathVariable UUID companyId,
-                                           @RequestParam UUID officerId
+                                           @RequestParam(required = false) UUID officerId
     ) {
         return companyService.updateCompanyOfficer(companyId, officerId);
     }

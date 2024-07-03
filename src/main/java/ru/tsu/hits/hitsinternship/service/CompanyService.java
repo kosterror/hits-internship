@@ -55,30 +55,36 @@ public class CompanyService {
 
     public CompanyDto updateCompanyCurator(UUID companyId, UUID curatorId) {
         var company = getCompanyEntity(companyId);
-        var curator = userService.getUserEntityById(curatorId);
 
-        if (curator.getRoles().size() == 1 && curator.getRoles().getFirst().equals(Role.STUDENT)) {
-            throw new ConflictException("Студент не может стать куратором компании");
+        if (curatorId == null) {
+            company.setCurator(null);
+        } else {
+            var curator = userService.getUserEntityById(curatorId);
+            if (curator.getRoles().size() == 1 && curator.getRoles().getFirst().equals(Role.STUDENT)) {
+                throw new ConflictException("Студент не может стать куратором компании");
+            }
+
+            company.setCurator(curator);
         }
-
-        company.setCurator(curator);
         company = companyRepository.save(company);
-
         return companyMapper.entityToDto(company);
     }
 
     public CompanyDto updateCompanyOfficer(UUID companyId, UUID officerId) {
         var company = getCompanyEntity(companyId);
-        var officer = userService.getUserEntityById(officerId);
 
-        if (officer.getRoles().size() == 1 && officer.getRoles().getFirst().equals(Role.STUDENT)) {
-            throw new ConflictException("Студент не может стать представителем компании");
+        if (officerId == null){
+            company.setOfficer(null);
+        } else {
+            var officer = userService.getUserEntityById(officerId);
+
+            if (officer.getRoles().size() == 1 && officer.getRoles().getFirst().equals(Role.STUDENT)) {
+                throw new ConflictException("Студент не может стать представителем компании");
+            }
+
+            company.setOfficer(officer);
         }
-
-
-        company.setOfficer(officer);
         company = companyRepository.save(company);
-
         return companyMapper.entityToDto(company);
     }
 
